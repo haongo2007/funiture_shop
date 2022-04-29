@@ -167,6 +167,7 @@ export default {
     created: function() {
         let min = this.minPrice;
         let max = this.maxPrice;
+        console.log(this.product.variants);
         this.product.variants.map(item => {
             if (min > item.price) min = item.price;
             if (max < item.price) max = item.price;

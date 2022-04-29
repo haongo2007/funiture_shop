@@ -23,10 +23,10 @@
                     <div class="product-detail">
                         <figure>
                             <img
-                                v-lazy="`${baseUrl}${prevProduct.sm_pictures[0].url}`"
+                                v-lazy="`${baseDomain}${prevProduct.pictures[0]+'&w=150&h=150'}`"
                                 alt="product"
-                                :width="prevProduct.sm_pictures[0].width"
-                                :height="prevProduct.sm_pictures[0].height"
+                                width="150"
+                                height="150"
                             />
                         </figure>
                         <h3 class="product-name">{{ prevProduct.name }}</h3>
@@ -43,10 +43,10 @@
                     <div class="product-detail">
                         <figure>
                             <img
-                                v-lazy="`${baseUrl}${nextProduct.sm_pictures[0].url}`"
+                                v-lazy="`${baseDomain}${nextProduct.pictures[0]+'&w=150&h=150'}`"
                                 alt="product"
-                                :width="nextProduct.sm_pictures[0].width"
-                                :height="nextProduct.sm_pictures[0].height"
+                                width="150"
+                                height="150"
                             />
                         </figure>
                         <h3 class="product-name">{{ nextProduct.name }}</h3>
@@ -57,7 +57,7 @@
     </nav>
 </template>
 <script>
-import { baseUrl } from '~/repositories/repository';
+import { baseDomain } from '~/repositories/repository';
 
 export default {
     props: {
@@ -73,7 +73,7 @@ export default {
     },
     data: function() {
         return {
-            baseUrl: baseUrl
+            baseDomain: baseDomain
         };
     }
 };

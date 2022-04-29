@@ -8,10 +8,10 @@
                 <span class="product-label label-out" v-if="product.stock === 0">Out Of Stock</span>
                 <img
                     id="product-zoom"
-                    v-lazy="`${baseUrl}${product.pictures[currentIndex].url}`"
+                    v-lazy="`${baseDomain}${product.pictures[currentIndex]+'&w=575&h=575'}`"
                     alt="product"
-                    :width="product.pictures[currentIndex].width"
-                    :height="product.pictures[currentIndex].height"
+                    width="575"
+                    height="575"
                 />
 
                 <a
@@ -29,14 +29,14 @@
                     class="product-gallery-item h-100 h-lg-auto carousel-dot"
                     :class="{active: currentIndex== index}"
                     href="#"
-                    v-for="(smPicture, index) in product.sm_pictures"
+                    v-for="(smPicture, index) in product.pictures"
                     :key="index"
                     @click.prevent="changePicture(index)"
                 >
                     <img
-                        :src="`${baseUrl}${smPicture.url}`"
-                        :width="smPicture.width"
-                        :height="smPicture.height"
+                        :src="`${baseDomain}${smPicture+'&w=150&h=150'}`"
+                        width="150"
+                        height="150"
                         alt="product side"
                     />
                 </a>
@@ -57,7 +57,7 @@ import LightBox from 'vue-image-lightbox';
 
 import { VueLazyloadImage } from 'vue-lazyload';
 import 'vue-image-lightbox/dist/vue-image-lightbox.min.css';
-import { baseUrl } from '~/repositories/repository.js';
+import { baseDomain } from '~/repositories/repository.js';
 
 export default {
     components: {
@@ -76,7 +76,7 @@ export default {
     },
     data: function() {
         return {
-            baseUrl: baseUrl,
+            baseDomain: baseDomain,
             currentIndex: 0
         };
     },
@@ -86,8 +86,8 @@ export default {
                 return [
                     ...acc,
                     {
-                        thumb: `${baseUrl}${cur.url}`,
-                        src: `${baseUrl}${cur.url}`,
+                        thumb: `${baseDomain}${cur}`,
+                        src: `${baseDomain}${cur}`,
                         caption: this.product.name
                     }
                 ];

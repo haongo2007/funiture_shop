@@ -8,7 +8,7 @@
                     <div class="row skel-pro-single" :class="{loaded: loaded}">
                         <div class="col-md-6">
                             <div class="skel-product-gallery"></div>
-                            <gallery-vertical :product="product"></gallery-vertical>
+                            <components :is="ProductGallery" :product="product" />
                         </div>
 
                         <div class="col-md-6">
@@ -20,7 +20,7 @@
                                     <div class="entry-summary2"></div>
                                 </div>
                             </div>
-                            <detail-one :product="product" v-if="product"></detail-one>
+                            <components :is="ProductDetail" :product="product" />
                         </div>
                     </div>
                 </div>
@@ -56,7 +56,9 @@ export default {
             prevProduct: null,
             nextProduct: null,
             relatedProducts: [],
-            loaded: false
+            loaded: false,
+            ProductDetail:'',
+            ProductGallery:'',
         };
     },
     created: function() {
@@ -69,10 +71,12 @@ export default {
                 `${baseUrl}/product/${this.$route.params.slug}`,
             )
                 .then(response => {
-                    this.product = { ...response.data.data };
-                    // this.relatedProducts = [...response.data.relatedProducts];
-                    // this.prevProduct = response.data.prevProduct;
-                    // this.nextProduct = response.data.nextProduct;
+                    this.product = { ...response.data.data.product };
+                    this.relatedProducts = [...response.data.data.relatedProducts];
+                    this.prevProduct = response.data.data.prevProduct;
+                    this.nextProduct = response.data.data.nextProduct;
+                    this.ProductDetail = 'DetailOne';
+                    this.ProductGallery = 'GalleryVertical';
                     this.loaded = true;
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));

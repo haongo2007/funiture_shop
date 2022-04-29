@@ -479,7 +479,7 @@
                                 <ul>
                                     <li>
                                         <nuxt-link
-                                            to="/product/ngo-van-hao"
+                                            to="/product/jeans-coat"
                                         >Default</nuxt-link>
                                     </li>
                                     <li>

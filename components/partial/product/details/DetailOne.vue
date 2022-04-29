@@ -29,7 +29,7 @@
         </template>
 
         <div class="product-content">
-            <p>{{ product.short_desc }}</p>
+            <p>{{ product.short_desc.description }}</p>
         </div>
 
         <template v-if="product.variants.length > 0">
@@ -122,8 +122,8 @@
                 <span>Category:</span>
                 <span v-for="(cat, index) of product.category" :key="index">
                     <nuxt-link
-                        :to="{path: '/shop/sidebar/list', query: {category: cat.slug}}"
-                    >{{ cat.name }}</nuxt-link>
+                        :to="{path: '/shop/sidebar/list', query: {category: cat.alias}}"
+                    >{{ cat.descriptions_with_lang_default.title }}</nuxt-link>
                     {{ index < product.category.length - 1 ? ',' : '' }}
                 </span>
             </div>
@@ -151,10 +151,10 @@
                         <figure class="product-media">
                             <nuxt-link :to="'/product/default/'+ product.slug">
                                 <img
-                                    v-lazy="`${baseUrl}${product.sm_pictures[0].url}`"
+                                    v-lazy="`${baseDomain}${product.pictures[0]+'&w=150&h=150'}`"
                                     alt="Product"
-                                    :width="product.sm_pictures[0].width"
-                                    :height="product.sm_pictures[0].height"
+                                    width="150"
+                                    height="150"
                                 />
                             </nuxt-link>
                         </figure>
@@ -223,7 +223,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import { VueSlideToggle } from 'vue-slide-toggle';
 import QuantityInput from '~/components/elements/QuantityInput';
-import { baseUrl } from '~/repositories/repository.js';
+import { baseDomain } from '~/repositories/repository.js';
 
 export default {
     components: {
@@ -237,7 +237,7 @@ export default {
     },
     data: function() {
         return {
-            baseUrl: baseUrl,
+            baseDomain: baseDomain,
             variationGroup: [],
             selectableGroup: [],
             sizeArray: [],
@@ -273,10 +273,10 @@ export default {
         }
     },
     created: function() {
+        console.log(this.product);
         let min = this.minPrice;
         let max = this.maxPrice;
-            console.log(this.product)
-        this.variationGroup = this.product.reduce((acc, cur) => {
+        this.variationGroup = this.product.variants.reduce((acc, cur) => {
             cur.size.map(item => {
                 acc.push({
                     color: cur.color,
@@ -289,7 +289,6 @@ export default {
             if (max < cur.price) max = cur.price;
             return acc;
         }, []);
-        console.log(this.variationGroup);
         if (this.product.length == 0) {
             min = this.product.sale_price
                 ? this.product.sale_price
@@ -299,7 +298,6 @@ export default {
 
         this.minPrice = min;
         this.maxPrice = max;
-
         this.refreshSelectableGroup();
     },
     methods: {
