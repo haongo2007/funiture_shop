@@ -15,16 +15,14 @@
         </div>
 
         <template v-else>
-            <div class="product-price" v-if="minPrice == maxPrice">${{ minPrice.toFixed(2) }}</div>
+            <div class="product-price" v-if="product.sale_price">
+                <span class="new-price">${{ product.sale_price.price_promotion.toFixed(2) }}</span>
+                <span class="old-price">${{ product.price.toFixed(2) }}</span>
+            </div>
             <template v-else>
-                <div class="product-price" v-if="product.variants.length == 0">
-                    <span class="new-price">${{ minPrice.toFixed(2) }}</span>
-                    <span class="old-price">${{ maxPrice.toFixed(2) }}</span>
+                <div class="product-price">
+                    <span class="new-price">${{ product.price.toFixed(2) }}</span>
                 </div>
-                <div
-                    class="product-price"
-                    v-else
-                >${{minPrice.toFixed(2)}} - ${{maxPrice.toFixed(2)}}</div>
             </template>
         </template>
 
@@ -38,6 +36,7 @@
 
                 <div class="product-nav product-nav-dots">
                     <a
+                        :title="item.colorName"
                         href="#"
                         :class="{active: item.color == selectedVariant.color, disabled: item.disabled}"
                         :style="{'background-color': item.color}"
@@ -55,12 +54,11 @@
                         name="size"
                         id="size"
                         class="form-control"
-                        v-model="selectedVariant.size"
-                        @change="selectSize"
+                        @change="selectSize($event)"
                     >
                         <option value="null">Select a size</option>
                         <option
-                            :value="item.size"
+                            :value="item.size+'__'+item.size_price"
                             v-for="(item, index) in sizeArray"
                             :key="index"
                         >{{ item.size }}</option>
@@ -75,7 +73,7 @@
             <vue-slide-toggle :open="showVariationPrice">
                 <div
                     class="product-price"
-                >${{ selectedVariant.price ? selectedVariant.price.toFixed(2) : 0 }}</div>
+                >${{ selectedVariant.price ? (parseInt(selectedVariant.price)+parseInt(selectedVariant.size_price)).toFixed(2) : 0 }}</div>
             </vue-slide-toggle>
         </template>
 
@@ -246,7 +244,8 @@ export default {
                 color: null,
                 colorName: null,
                 price: null,
-                size: null
+                size: null,
+                size_price: null
             },
             maxPrice: 0,
             minPrice: 99999,
@@ -273,7 +272,6 @@ export default {
         }
     },
     created: function() {
-        console.log(this.product);
         let min = this.minPrice;
         let max = this.maxPrice;
         this.variationGroup = this.product.variants.reduce((acc, cur) => {
@@ -282,16 +280,17 @@ export default {
                     color: cur.color,
                     colorName: cur.color_name,
                     size: item.name,
-                    price: cur.price
+                    size_price: item.price ?? 0,
+                    price: cur.price,
                 });
             });
             if (min > cur.price) min = cur.price;
             if (max < cur.price) max = cur.price;
             return acc;
         }, []);
-        if (this.product.length == 0) {
+        if (this.product.variants.length == 0) {
             min = this.product.sale_price
-                ? this.product.sale_price
+                ? this.product.sale_price.price_promotion
                 : this.product.price;
             max = this.product.price;
         }
@@ -314,13 +313,12 @@ export default {
                     return [...acc, cur];
                 }, []);
             }
-
             this.sizeArray = tempArray.reduce((acc, cur) => {
-                if (acc.findIndex(item => item.size == cur.size) !== -1)
-                    return acc;
+                if (acc.findIndex(item => item.size == cur.size) !== -1){
+                    return cur;
+                }
                 return [...acc, cur];
             }, []);
-
             tempArray = [...this.variationGroup];
             if (this.selectedVariant.size) {
                 tempArray = this.variationGroup.reduce((acc, cur) => {
@@ -332,15 +330,13 @@ export default {
             }
 
             this.colorArray = this.product.variants.reduce((acc, cur) => {
-                if (
-                    tempArray.findIndex(item => item.color == cur.color) == -1
-                ) {
+                if (tempArray.findIndex(item => item.color == cur.color) == -1) {
                     return [
                         ...acc,
                         {
                             color: cur.color,
                             colorName: cur.color_name,
-                            price: cur.price,
+                            price: 0,
                             disabled: true
                         }
                     ];
@@ -351,6 +347,7 @@ export default {
                         color: cur.color,
                         colorName: cur.color_name,
                         price: cur.price,
+                        size_price: cur.size.price ?? 0,
                         disabled: false
                     }
                 ];
@@ -362,21 +359,26 @@ export default {
                     ...this.selectedVariant,
                     color: null,
                     colorName: null,
-                    price: item.price
+                    price: item.price,
+                    size_price: this.selectedVariant.size_price
                 };
             } else {
                 this.selectedVariant = {
                     ...this.selectedVariant,
                     color: item.color,
                     colorName: item.colorName,
-                    price: item.price
+                    price: item.price,
+                    size_price: this.selectedVariant.size_price
                 };
             }
             this.refreshSelectableGroup();
         },
-        selectSize: function() {
+        selectSize: function(e) {
+            let val = e.target.value.split('__');
+            this.selectedVariant.size = val[0];
+            this.selectedVariant.size_price = val[1];
             if (this.selectedVariant.size == 'null') {
-                this.selectedVariant = { ...this.selectedVariant, size: null };
+                this.selectedVariant = { ...this.selectedVariant, size: null,size_price:0 };
             }
             this.refreshSelectableGroup();
         },

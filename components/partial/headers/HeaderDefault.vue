@@ -76,7 +76,7 @@
 						class="logo"
 					>
 						<img
-							v-lazy="'./images/logo.png'"
+							v-lazy="logo"
 							class="bg-transparent"
 							alt="Molla Logo"
 							width="104"
@@ -190,6 +190,7 @@ import WishlistMenu from '~/components/partial/headers/shared/WishlistMenu';
 import MainMenu from '~/components/partial/headers/shared/MainMenu';
 import HeaderSearch from '~/components/partial/headers/shared/HeaderSearch';
 import StickyHeader from '~/components/elements/StickyHeader';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
 	components: {
@@ -200,6 +201,7 @@ export default {
 		StickyHeader
 	},
 	computed: {
+        ...mapGetters('store', ['logo']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
 		}

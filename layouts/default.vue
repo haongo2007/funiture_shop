@@ -17,8 +17,44 @@
 import HeaderDefault from '~/components/partial/headers/HeaderDefault';
 import FooterDefault from '~/components/partial/footers/FooterDefault';
 import { isSafariBrowser, isEdgeBrowser } from '~/utilities/common';
+import Repository, { baseUrl } from '~/repositories/repository.js';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
+    head() {
+        return Object.assign({},this.head);
+    },
+    data:function(){
+        return {
+            head:{
+                titleTemplate: '',
+                title: '',
+                meta: [
+                    {
+                        hid: '',
+                        name: '',
+                        content:''
+                    },
+                    {
+                        name: 'author',
+                        content: ''
+                    },
+                    {
+                        name: 'keywords',
+                        content: ''
+                    },
+                    {
+                        name: 'app-mobile-web-app-title',
+                        content: ''
+                    },
+                    {
+                        name: 'application-name',
+                        content: '',
+                    },
+                ]
+            }
+        }
+    },
     components: {
         HeaderDefault,
         FooterDefault: () =>
@@ -38,8 +74,13 @@ export default {
             },
             false
         );
+        if (Object.keys(this.info()).length === 0 ) {
+            this.getInfoStore();
+        }
     },
     methods: {
+        ...mapGetters('store', ['info']),
+        ...mapGetters('store', ['titlePage']),
         scrollTop: function() {
             if (isSafariBrowser() || isEdgeBrowser()) {
                 let pos = window.pageYOffset;
@@ -57,6 +98,15 @@ export default {
         },
         hideMobileMenu: function() {
             document.querySelector('body').classList.remove('mmenu-active');
+        },
+        getInfoStore(){
+            Repository.get(`${baseUrl}/store/getInfo`)
+                .then(response => {
+                    this.$store.dispatch('store/setInfoStore',response.data.data);
+                    this.head.titleTemplate = this.titlePage();
+                    this.head.title = this.titlePage();
+                })
+                .catch(error => ({ error: JSON.stringify(error) }));
         }
     }
 };

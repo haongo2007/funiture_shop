@@ -43,6 +43,9 @@ import RelatedProductsOne from '~/components/partial/product/related/RelatedProd
 import Repository, { baseUrl } from '~/repositories/repository.js';
 
 export default {
+    head() {
+        return Object.assign({},this.head);
+    },
     components: {
         DetailOne,
         InfoOne,
@@ -52,6 +55,21 @@ export default {
     },
     data: function() {
         return {
+            head:{
+                titleTemplate: '',
+                title: '',
+                meta: [
+                    {
+                        hid: '',
+                        name: '',
+                        content:''
+                    },
+                    {
+                        name: 'keywords',
+                        content: ''
+                    },
+                ]
+            },
             product: null,
             prevProduct: null,
             nextProduct: null,
@@ -65,6 +83,7 @@ export default {
         this.getProduct();
     },
     methods: {
+        ...mapGetters('store', ['titlePage']),
         getProduct: async function() {
             this.loaded = false;
             await Repository.get(
@@ -72,6 +91,13 @@ export default {
             )
                 .then(response => {
                     this.product = { ...response.data.data.product };
+                    if (Object.keys(this.product).length) {
+                        this.head.titleTemplate = this.product.name + ' | ' + this.titlePage();
+                        this.head.title =  this.product.name + ' | ' + this.titlePage();
+                    }else{
+                        this.head.titleTemplate = this.titlePage();
+                        this.head.title = this.titlePage();
+                    }
                     this.relatedProducts = [...response.data.data.relatedProducts];
                     this.prevProduct = response.data.data.prevProduct;
                     this.nextProduct = response.data.data.nextProduct;

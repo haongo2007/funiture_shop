@@ -1,34 +1,12 @@
 export default {
     head: {
-        titleTemplate: 'Molla - Multi-purpose eCommerce Vue Template',
-        title: 'Molla - Multi-purpose eCommerce Vue Template',
+        titleTemplate: '',
+        title: '',
         meta: [
             { charset: 'utf-8' },
             {
                 name: 'viewport',
                 content: 'width=device-width, initial-scale=1'
-            },
-            {
-                hid: 'description',
-                name: 'description',
-                content:
-                    'Molla - Multi-purpose eCommerce Vue Template'
-            },
-            {
-                name: 'author',
-                content: 'd-themes'
-            },
-            {
-                name: 'keywords',
-                content: 'Molla Vue eCommerce Template'
-            },
-            {
-                name: 'app-mobile-web-app-title',
-                content: 'Molla'
-            },
-            {
-                name: 'application-name',
-                content: 'Molla Vue eCommerce Template',
             },
             {
                 name: 'msapplication-TileColor',
