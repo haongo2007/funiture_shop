@@ -45,6 +45,9 @@ export const getters = {
         return state.currency;
     },
     getCategories: state => {
+        state.categories.forEach(function (i,v) {
+            i['child'] = [];
+        })
         return state.categories;
     }
 }

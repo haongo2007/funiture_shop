@@ -477,7 +477,7 @@ export default {
         ...mapGetters('demo', ['newsletterShow'])
     },
     created: function() {
-        this.getProducts();
+        // this.getProducts();
     },
     mounted: function() {
         if (this.newsletterShow) {

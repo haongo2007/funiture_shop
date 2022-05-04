@@ -24,14 +24,14 @@ const service = axios.create({
 // Request intercepter
 service.interceptors.request.use(
   config => {
-    if (Cookies.get('language')) {
-      config.headers['x-localization'] = Cookies.get('language'); // Set Language
+    if (Cookies.get('f-language')) {
+      config.headers['x-localization'] = Cookies.get('f-language'); // Set Language
     }
-    if (Cookies.get('store')) {
-      config.headers['x-store'] = Cookies.get('store'); // Set store
+    if (Cookies.get('f-store')) {
+      config.headers['x-store'] = Cookies.get('f-store'); // Set store
     }
-    if (Cookies.get('currency')) {
-      config.headers['x-currency'] = Cookies.get('currency'); // Set store
+    if (Cookies.get('f-currency')) {
+      config.headers['x-currency'] = Cookies.get('f-currency'); // Set store
     }
     return config;
   },

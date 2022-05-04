@@ -20,7 +20,6 @@ import { isSafariBrowser, isEdgeBrowser } from '~/utilities/common';
 import Repository, { baseUrl } from '~/repositories/repository.js';
 import { mapGetters, mapActions } from 'vuex';
 import Cookies from 'js-cookie';
-
 export default {
     head() {
         return Object.assign({},this.head);
@@ -114,11 +113,10 @@ export default {
                     // set meta
                     this.head.titleTemplate = this.titlePage();
                     this.head.title = this.titlePage();
-
                     // set cookie
-                    Cookies.set('store', this.info().id);
-                    Cookies.set('language', this.getLang.code);
-                    Cookies.set('currency', this.getCurrency.code);
+                    Cookies.set('f-store', this.info().id);
+                    Cookies.set('f-language', this.getLang.code);
+                    Cookies.set('f-currency', this.getCurrency.code);
                     
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));

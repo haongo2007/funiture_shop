@@ -113,7 +113,7 @@
 
 							<div class="dropdown-menu">
 								<nav class="side-nav">
-									<categories-menu :data-categories="getCategories"/>
+									<categories-menu/>
 								</nav>
 							</div>
 						</div>
@@ -161,7 +161,6 @@ export default {
         ...mapGetters('store', ['getCurrencies']),
         ...mapGetters('store', ['getLang']),
         ...mapGetters('store', ['getCurrency']),
-        ...mapGetters('store', ['getCategories']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
 		},
@@ -175,11 +174,11 @@ export default {
 	},
 	methods: {
 		changeCurrency(code){
-			Cookies.set('language',code);
+			Cookies.set('f-currency',code);
             this.$store.dispatch('store/setCurrency',code);
 		},
 		changeLanguage(code){
-			Cookies.set('currency',code);
+			Cookies.set('f-language',code);
             this.$store.dispatch('store/setLang',code);
 		},
 		openSignInModal() {
