@@ -95,8 +95,7 @@ export default {
                         this.head.titleTemplate = this.product.name + ' | ' + this.titlePage();
                         this.head.title =  this.product.name + ' | ' + this.titlePage();
                     }else{
-                        this.head.titleTemplate = this.titlePage();
-                        this.head.title = this.titlePage();
+                        this.$router.push({path: '/pages/404'});
                     }
                     this.relatedProducts = [...response.data.data.relatedProducts];
                     this.prevProduct = response.data.data.prevProduct;

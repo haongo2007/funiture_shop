@@ -31,5 +31,27 @@
     </main>
 </template>
 <script>
-export default {};
+import { mapGetters } from 'vuex';
+export default {
+    head() {
+        return {
+            titleTemplate: 'Not found - '+ this.titlePage,
+            title: 'Not found - '+ this.titlePage,
+            meta: [
+                {
+                    hid: '',
+                    name: '',
+                    content:''
+                },
+                {
+                    name: 'keywords',
+                    content: ''
+                },
+            ]
+        }
+    },
+    computed:{
+        ...mapGetters('store', ['titlePage']),
+    }
+};
 </script>

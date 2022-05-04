@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const domain = 'http://localhost:8000/';
 const domainPrefix = 'api';
@@ -8,14 +9,37 @@ export const customHeaders = {
     Accept: 'application/json',
 };
 
-
 export const baseDomain = `${domain}`;
 export const basePrefix = `${domainPrefix}`;
 
 export const baseUrl = `${domain}`+`${domainPrefix}`;
 
+// Create axios instance
+const service = axios.create({
+  baseUrl,
+  headers: customHeaders,
+  timeout: 10000, // Request timeout
+});
 
-export default axios.create( {
-    baseUrl,
-    headers: customHeaders
-} );
+// Request intercepter
+service.interceptors.request.use(
+  config => {
+    if (Cookies.get('language')) {
+      config.headers['x-localization'] = Cookies.get('language'); // Set Language
+    }
+    if (Cookies.get('store')) {
+      config.headers['x-store'] = Cookies.get('store'); // Set store
+    }
+    if (Cookies.get('currency')) {
+      config.headers['x-currency'] = Cookies.get('currency'); // Set store
+    }
+    return config;
+  },
+  error => {
+    // Do something with request error
+    Promise.reject(error);
+  }
+);
+
+
+export default service;

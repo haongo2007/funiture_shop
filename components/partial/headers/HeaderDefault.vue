@@ -16,14 +16,11 @@
 							<ul>
 								<li>
 									<div class="header-dropdown">
-										<a href="#">USD</a>
+										<a href="#">{{ getCurrency.name }}</a>
 										<div class="header-menu">
 											<ul>
-												<li>
-													<a href="#">Eur</a>
-												</li>
-												<li>
-													<a href="#">Usd</a>
+												<li v-for="item in getCurrencies" :key="item.id">
+													<a @click="changeCurrency(item.code)" href="#" :class="item.code == getCurrency.code ? 'disabled' : ''">{{ item.name }}</a>
 												</li>
 											</ul>
 										</div>
@@ -31,17 +28,11 @@
 								</li>
 								<li>
 									<div class="header-dropdown">
-										<a href="#">English</a>
+										<a href="#">{{ getLang.name }}</a>
 										<div class="header-menu">
 											<ul>
-												<li>
-													<a href="#">English</a>
-												</li>
-												<li>
-													<a href="#">French</a>
-												</li>
-												<li>
-													<a href="#">Spanish</a>
+												<li v-for="item in getLanguages" :key="item.id">
+													<a @click="changeLanguage(item.code)" href="#" :class="item.code == getLang.code ? 'disabled' : ''">{{ item.name }}</a>
 												</li>
 											</ul>
 										</div>
@@ -122,46 +113,7 @@
 
 							<div class="dropdown-menu">
 								<nav class="side-nav">
-									<ul class="menu-vertical sf-arrows">
-										<li
-											class="item-lead"
-											:class="{active: $route.query.category=='electronics'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=electronics'">Electronics</nuxt-link>
-										</li>
-										<!-- <li
-											class="item-lead"
-											:class="{active: $route.query.category=='gift-idea'}"
-										>
-											<nuxt-link :to="'/shop/sidebar/3cols?category=gift-idea'">Gift Ideas</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='beds'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=beds'">Beds</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='lighting'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=lighting'">Lighting</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='sofas-and-sleeper-sofas'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=sofas-and-sleeper-sofas'">Sofas & Sleeper sofas</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='storage'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=storage'">Storage</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='armchairs-and-chaises'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=armchairs-and-chaises'">Armchairs & Chaises</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='decoration'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=decoration'">Decoration</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='kitchen-cabinets'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=kitchen-cabinets'">Kitchen Cabinets</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='coffee-and-tables'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=coffee-and-tables'">Coffee & Tables</nuxt-link>
-										</li>
-										<li :class="{active: $route.query.category=='furniture'}">
-											<nuxt-link :to="'/shop/sidebar/3cols?category=furniture'">Outdoor Furniture</nuxt-link>
-										</li> -->
-									</ul>
+									<categories-menu :data-categories="getCategories"/>
 								</nav>
 							</div>
 						</div>
@@ -190,7 +142,9 @@ import WishlistMenu from '~/components/partial/headers/shared/WishlistMenu';
 import MainMenu from '~/components/partial/headers/shared/MainMenu';
 import HeaderSearch from '~/components/partial/headers/shared/HeaderSearch';
 import StickyHeader from '~/components/elements/StickyHeader';
+import CategoriesMenu from '~/components/elements/CategoriesMenu';
 import { mapGetters, mapActions } from 'vuex';
+import Cookies from 'js-cookie';
 
 export default {
 	components: {
@@ -198,19 +152,35 @@ export default {
 		WishlistMenu,
 		MainMenu,
 		HeaderSearch,
-		StickyHeader
+		StickyHeader,
+		CategoriesMenu
 	},
 	computed: {
         ...mapGetters('store', ['logo']),
+        ...mapGetters('store', ['getLanguages']),
+        ...mapGetters('store', ['getCurrencies']),
+        ...mapGetters('store', ['getLang']),
+        ...mapGetters('store', ['getCurrency']),
+        ...mapGetters('store', ['getCategories']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
-		}
+		},
+	},
+	watch: {
+	  '$store.state.store.info': function() {
+
+	  }
 	},
 	created(){
-		this.getCategoryList();
 	},
 	methods: {
-		getCategoryList(){
+		changeCurrency(code){
+			Cookies.set('language',code);
+            this.$store.dispatch('store/setCurrency',code);
+		},
+		changeLanguage(code){
+			Cookies.set('currency',code);
+            this.$store.dispatch('store/setLang',code);
 		},
 		openSignInModal() {
 			this.$modal.show(
@@ -225,3 +195,9 @@ export default {
 	}
 };
 </script>
+<style type="text/css">
+	.disabled{
+		pointer-events: none !important;
+		color: #a6c76c !important;
+	}
+</style>

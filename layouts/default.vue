@@ -19,6 +19,7 @@ import FooterDefault from '~/components/partial/footers/FooterDefault';
 import { isSafariBrowser, isEdgeBrowser } from '~/utilities/common';
 import Repository, { baseUrl } from '~/repositories/repository.js';
 import { mapGetters, mapActions } from 'vuex';
+import Cookies from 'js-cookie';
 
 export default {
     head() {
@@ -78,6 +79,10 @@ export default {
             this.getInfoStore();
         }
     },
+    computed:{
+        ...mapGetters('store', ['getLang']),
+        ...mapGetters('store', ['getCurrency']),
+    },
     methods: {
         ...mapGetters('store', ['info']),
         ...mapGetters('store', ['titlePage']),
@@ -102,9 +107,19 @@ export default {
         getInfoStore(){
             Repository.get(`${baseUrl}/store/getInfo`)
                 .then(response => {
-                    this.$store.dispatch('store/setInfoStore',response.data.data);
+                    this.$store.dispatch('store/setInfoStore',response.data.data.store);
+                    this.$store.dispatch('store/setLanguages',response.data.data.languages);
+                    this.$store.dispatch('store/setCurrencies',response.data.data.currencies);
+                    this.$store.dispatch('store/setCategories',response.data.data.categories);
+                    // set meta
                     this.head.titleTemplate = this.titlePage();
                     this.head.title = this.titlePage();
+
+                    // set cookie
+                    Cookies.set('store', this.info().id);
+                    Cookies.set('language', this.getLang.code);
+                    Cookies.set('currency', this.getCurrency.code);
+                    
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));
         }
