@@ -4,6 +4,9 @@ export const SET_CURRENCIES = 'SET_CURRENCIES';
 export const SET_CURRENCY = 'SET_CURRENCY';
 export const SET_LANG = 'SET_LANG';
 export const SET_CATEGORIES = 'SET_CATEGORIES';
+export const SET_SLIDER = 'SET_SLIDER';
+export const SET_BRAND = 'SET_BRAND';
+export const SET_BANNER = 'SET_BANNER';
 
 export const state = () => (
     {
@@ -19,6 +22,9 @@ export const state = () => (
         languages: [],
         currencies: [],
         categories: [],
+        slider:[],
+        brand:[],
+        banner:[],
     }
 );
 
@@ -45,10 +51,16 @@ export const getters = {
         return state.currency;
     },
     getCategories: state => {
-        state.categories.forEach(function (i,v) {
-            i['child'] = [];
-        })
         return state.categories;
+    },
+    getSlider: state => {
+        return state.slider;
+    },
+    getBrand: state => {
+        return state.brand;
+    },
+    getBanner: state => {
+        return state.banner;
     }
 }
 
@@ -70,8 +82,16 @@ export const actions = {
     },
     setCategories: function ({commit},categories){
         commit( SET_CATEGORIES, categories );
-    }
-
+    },
+    setSlideHome: function ({commit},slider){
+        commit( SET_SLIDER, slider );
+    },
+    setBrandHome:function ({commit},brand){
+        commit( SET_BRAND, brand );
+    },
+    setBannerHome:function ({commit},banner){
+        commit( SET_BANNER, banner );
+    },
 }
 
 export const mutations = {
@@ -98,6 +118,15 @@ export const mutations = {
     },
     [ SET_CATEGORIES ] ( state,categories ) {
         state.categories = categories;
+    },
+    [ SET_SLIDER ] ( state,slider ) {
+        state.slider = slider;
+    },
+    [ SET_BRAND ] ( state,brand ) {
+        state.brand = brand;
+    },
+    [ SET_BANNER ] ( state,banner ) {
+        state.banner = banner;
     },
 }
 

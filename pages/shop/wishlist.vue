@@ -45,10 +45,10 @@
 									<figure class="product-media">
 										<nuxt-link :to="'/product/default/' + product.slug">
 											<img
-												v-lazy="`${baseUrl}${product.sm_pictures[0].url}`"
+												v-lazy="`${baseDomain}${product.pictures[0].url}`+'&w=150&h=150'"
 												alt="Product"
-												:width="product.sm_pictures[0].width"
-												:height="product.sm_pictures[0].height"
+												width="150"
+												height="150"
 											/>
 										</nuxt-link>
 									</figure>
@@ -187,7 +187,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import PageHeader from '~/components/elements/PageHeader';
-import { baseUrl } from '~/repositories/repository.js';
+import { baseDomain } from '~/repositories/repository.js';
 
 export default {
 	components: {
@@ -195,7 +195,7 @@ export default {
 	},
 	data: function() {
 		return {
-			baseUrl: baseUrl
+			baseDomain: baseDomain
 		};
 	},
 	computed: {

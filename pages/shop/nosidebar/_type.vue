@@ -136,17 +136,17 @@ export default {
     methods: {
         getProducts: async function(samePage = false, loadMore = false) {
             if (!loadMore) this.loaded = false;
-            await Repository.get(`${baseUrl}/shop`, {
+            await Repository.get(`${baseUrl}/product`, {
                 params: {
                     ...this.$route.query,
                     orderBy: this.orderBy,
-                    perPage: this.perPage,
-                    demo: this.currentDemo
+                    perPage: this.perPage
                 }
             })
                 .then(response => {
-                    this.products = response.data.products;
-                    this.totalCount = response.data.totalCount;
+                    console.log(response);
+                    this.products = response.data.data;
+                    this.totalCount = response.data.meta.total;
                     this.loaded = true;
                     if (samePage) {
                         scrollToPageContent();

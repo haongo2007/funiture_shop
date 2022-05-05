@@ -113,7 +113,7 @@
 
 							<div class="dropdown-menu">
 								<nav class="side-nav">
-									<categories-menu/>
+									<categories-menu :data-categories="getCategories"/>
 								</nav>
 							</div>
 						</div>
@@ -161,6 +161,7 @@ export default {
         ...mapGetters('store', ['getCurrencies']),
         ...mapGetters('store', ['getLang']),
         ...mapGetters('store', ['getCurrency']),
+        ...mapGetters('store', ['getCategories']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
 		},

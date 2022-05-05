@@ -110,6 +110,9 @@ export default {
                     this.$store.dispatch('store/setLanguages',response.data.data.languages);
                     this.$store.dispatch('store/setCurrencies',response.data.data.currencies);
                     this.$store.dispatch('store/setCategories',response.data.data.categories);
+                    this.$store.dispatch('store/setSlideHome',response.data.data.slider);
+                    this.$store.dispatch('store/setBrandHome',response.data.data.brands);
+                    this.$store.dispatch('store/setBannerHome',response.data.data.banner);
                     // set meta
                     this.head.titleTemplate = this.titlePage();
                     this.head.title = this.titlePage();

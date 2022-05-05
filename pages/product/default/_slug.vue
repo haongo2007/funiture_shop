@@ -8,7 +8,7 @@
                     <div class="row skel-pro-single" :class="{loaded: loaded}">
                         <div class="col-md-6">
                             <div class="skel-product-gallery"></div>
-                            <gallery-vertical :product="product"></gallery-vertical>
+                            <components :is="ProductGallery" :product="product" />
                         </div>
 
                         <div class="col-md-6">
@@ -20,7 +20,7 @@
                                     <div class="entry-summary2"></div>
                                 </div>
                             </div>
-                            <detail-one :product="product" v-if="product"></detail-one>
+                            <components :is="ProductDetail" :product="product" />
                         </div>
                     </div>
                 </div>
@@ -43,6 +43,9 @@ import RelatedProductsOne from '~/components/partial/product/related/RelatedProd
 import Repository, { baseUrl } from '~/repositories/repository.js';
 
 export default {
+    head() {
+        return Object.assign({},this.head);
+    },
     components: {
         DetailOne,
         InfoOne,
@@ -52,34 +55,53 @@ export default {
     },
     data: function() {
         return {
+            head:{
+                titleTemplate: '',
+                title: '',
+                meta: [
+                    {
+                        hid: '',
+                        name: '',
+                        content:''
+                    },
+                    {
+                        name: 'keywords',
+                        content: ''
+                    },
+                ]
+            },
             product: null,
             prevProduct: null,
             nextProduct: null,
             relatedProducts: [],
-            loaded: false
+            loaded: false,
+            ProductDetail:'',
+            ProductGallery:'',
         };
-    },
-    computed: {
-        ...mapGetters('demo', ['currentDemo'])
     },
     created: function() {
         this.getProduct();
     },
     methods: {
+        ...mapGetters('store', ['titlePage']),
         getProduct: async function() {
             this.loaded = false;
             await Repository.get(
                 `${baseUrl}/product/${this.$route.params.slug}`,
-                {
-                    params: { demo: this.currentDemo }
-                }
             )
                 .then(response => {
-                    console.log(response);
-                    this.product = { ...response.data.product };
-                    this.relatedProducts = [...response.data.relatedProducts];
-                    this.prevProduct = response.data.prevProduct;
-                    this.nextProduct = response.data.nextProduct;
+                    this.product = { ...response.data.data.product };
+                    if (Object.keys(this.product).length) {
+                        this.head.titleTemplate = this.product.name + ' | ' + this.titlePage();
+                        this.head.title =  this.product.name + ' | ' + this.titlePage();
+                    }else{
+                        this.$router.push({path: '/pages/404'});
+                    }
+                    this.relatedProducts = [...response.data.data.relatedProducts];
+                    this.prevProduct = response.data.data.prevProduct;
+                    this.nextProduct = response.data.data.nextProduct;
+                    this.ProductDetail = 'DetailOne';
+                    this.ProductGallery = 'GalleryVertical';
                     this.loaded = true;
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));

@@ -6,21 +6,21 @@
             <span class="product-label label-top" v-if="product.top">Top</span>
             <span class="product-label label-out" v-if="product.stock === 0">Out Of Stock</span>
 
-            <nuxt-link :to="'/product/default/'+ product.slug">
+            <nuxt-link :to="'/product/'+ product.slug">
                 <img
-                    v-lazy="`${baseUrl}${product.sm_pictures[0].url}`"
+                    v-lazy="`${baseDomain}${product.pictures[0]+'&w=150&h=150'}`"
                     alt="Product"
-                    :width="product.sm_pictures[0].width"
-                    :height="product.sm_pictures[0].height"
+                    width="150"
+                    height="150"
                     class="product-image"
                 />
                 <img
-                    v-lazy="`${baseUrl}${product.sm_pictures[1].url}`"
+                    v-lazy="`${baseDomain}${product.pictures[1]+'&w=150&h=150'}`"
                     alt="Product"
-                    :width="product.sm_pictures[1].width"
-                    :height="product.sm_pictures[1].height"
+                    width="150"
+                    height="150"
                     class="product-image-hover"
-                    v-if="product.sm_pictures[1]"
+                    v-if="product.pictures[1]"
                 />
             </nuxt-link>
 
@@ -121,15 +121,15 @@
     </div>
 </template>
 <script>
+import { baseDomain } from '~/repositories/repository.js';
 import { mapGetters, mapActions } from 'vuex';
-import { baseUrl } from '~/repositories/repository';
 export default {
     props: {
         product: Object
     },
     data: function() {
         return {
-            baseUrl: baseUrl,
+            baseDomain: baseDomain,
             maxPrice: 0,
             minPrice: 99999
         };

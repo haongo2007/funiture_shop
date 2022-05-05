@@ -1,72 +1,25 @@
 <template>
     <div class="main home-page">
         <div class="intro-slider-container">
-            <div class="swiper-carousel swiper-1">
+            <div class="swiper-carousel swiper-1" v-if="showCarousel1">
                 <div v-swiper:swiper1="carouselSetting1">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div
-                                class="intro-slide"
-                                v-lazy:background-image="'./images/home/sliders/slide-1.jpg'"
-                            >
+                        <div class="swiper-slide"  v-for="(item,index) in getSlider" :key="item.id">
+                            <div class="intro-slide" v-lazy:background-image="baseDomain+item.image">
                                 <div class="container intro-content">
-                                    <h3 class="intro-subtitle">Bedroom Furniture</h3>
-                                    <h1 class="intro-title">
-                                        Find Comfort
-                                        <br />That Suits You.
-                                    </h1>
+                                    <div v-if="item.html" v-html="item.html">
+                                    
+                                    </div>
+                                    <div v-else>
+                                        <h1 class="intro-title">
+                                            {{item.title}}
+                                        </h1>
+                                    </div>
 
-                                    <nuxt-link to="/shop/sidebar/list" class="btn btn-primary">
+                                    <a :href="item.url" class="btn btn-primary" :target="item.target">
                                         <span>Shop Now</span>
                                         <i class="icon-long-arrow-right"></i>
-                                    </nuxt-link>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div
-                                class="intro-slide"
-                                v-lazy:background-image="'./images/home/sliders/slide-2.jpg'"
-                            >
-                                <div class="container intro-content">
-                                    <h3 class="intro-subtitle">Deals and Promotions</h3>
-                                    <h1 class="intro-title">
-                                        Ypperlig
-                                        <br />Coffee Table
-                                        <br />
-                                        <span class="text-primary">
-                                            <sup>$</sup>49,99
-                                        </span>
-                                    </h1>
-
-                                    <nuxt-link to="/shop/sidebar/list" class="btn btn-primary">
-                                        <span>Shop Now</span>
-                                        <i class="icon-long-arrow-right"></i>
-                                    </nuxt-link>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div
-                                class="intro-slide"
-                                v-lazy:background-image="'./images/home/sliders/slide-3.jpg'"
-                            >
-                                <div class="container intro-content">
-                                    <h3 class="intro-subtitle">Living Room</h3>
-                                    <h1 class="intro-title">
-                                        Make Your Living Room
-                                        <br />Work For You.
-                                        <br />
-                                        <span class="text-primary">
-                                            <sup class="text-white font-weight-light">from</sup>
-                                            <sup>$</sup>9,99
-                                        </span>
-                                    </h1>
-
-                                    <nuxt-link to="/shop/sidebar/list" class="btn btn-primary">
-                                        <span>Shop Now</span>
-                                        <i class="icon-long-arrow-right"></i>
-                                    </nuxt-link>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -78,20 +31,16 @@
         <div class="swiper-carousel brands-border swiper-2 mb-3 mb-lg-5">
             <div v-swiper:swiper2="carouselSetting2">
                 <div class="swiper-wrapper">
-                    <div
-                        class="swiper-slide"
-                        v-for="(brand, index) in homeData.brands"
-                        :key="index"
-                    >
-                        <a href="javascript:;" class="brand">
+                    <div class="swiper-slide" v-for="(brand, index) in getBrand" :key="index">
+                        <nuxt-link :to="'/store?brands='+brand.alias" class="brand">
                             <img
-                                v-lazy="brand.image"
+                                v-lazy="baseDomain+brand.image"
                                 class="bg-white"
                                 alt="Brand"
-                                :width="brand.width"
-                                :height="brand.height"
+                                width="100"
+                                height="30"
                             />
-                        </a>
+                        </nuxt-link>
                     </div>
                 </div>
             </div>
@@ -100,27 +49,22 @@
         <div class="banner-group">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-6 col-lg-5">
-                        <div
-                            class="banner banner-large banner-overlay banner-overlay-light banner-1"
-                        >
-                            <a href="#">
+                    <div class="col-sm-6 col-lg-5" v-if="getBanner[0]">
+                        <div class="banner banner-large banner-overlay banner-overlay-light banner-1">
+                            <a :href="getBanner[1].url">
                                 <img
-                                    v-lazy="'./images/home/banners/banner-1.jpg'"
+                                    v-lazy="baseDomain+getBanner[0].image"
                                     width="470"
                                     height="510"
                                     alt="Banner"
                                 />
                             </a>
+                            <div v-html="getBanner[0].html" v-if="getBanner[0].html"></div>
+                            <div class="banner-content banner-content-top" v-else>
 
-                            <div class="banner-content banner-content-top">
-                                <h4 class="banner-subtitle">Clearence</h4>
+                                <h3 class="banner-title">{{ getBanner[0].title }}</h3>
 
-                                <h3 class="banner-title">Coffee Tables</h3>
-
-                                <div class="banner-text">from $19.99</div>
-
-                                <a href="#" class="btn btn-outline-gray banner-link">
+                                <a :href="getBanner[0].url" class="btn btn-outline-gray banner-link">
                                     Shop Now
                                     <i class="icon-long-arrow-right"></i>
                                 </a>
@@ -128,97 +72,109 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6 col-lg-3">
+                    <div class="col-sm-6 col-lg-3" v-if="getBanner[1]">
                         <div class="banner banner-overlay banner-2">
-                            <a href="#">
+                            <a :href="getBanner[1].url">
                                 <img
-                                    v-lazy="'./images/home/banners/banner-2.jpg'"
+                                    v-lazy="baseDomain+getBanner[1].image"
                                     width="290"
                                     height="510"
                                     alt="Banner"
                                 />
                             </a>
 
-                            <div class="banner-content banner-content-bottom">
-                                <h4 class="banner-subtitle text-grey">On Sale</h4>
+                            <div v-html="getBanner[1].html" v-if="getBanner[1].html"></div>
+
+                            <div class="banner-content banner-content-bottom" v-else>
 
                                 <h3 class="banner-title text-white">
-                                    Amazing
-                                    <br />Armchairs
+                                    {{ getBanner[1].title }}
                                 </h3>
 
-                                <div class="banner-text text-white">from $39.99</div>
-
-                                <nuxt-link
-                                    to="/shop/sidebar/3cols"
-                                    class="btn btn-outline-white banner-link"
-                                >
+                                <a :href="getBanner[1].url" class="btn btn-outline-white banner-link" >
                                     Discover Now
                                     <i class="icon-long-arrow-right"></i>
-                                </nuxt-link>
+                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-sm-12 col-md-12 col-lg-4">
+                    <div class="col-sm-12 col-md-12 col-lg-4" v-if="getBanner[2]">
                         <div class="row">
                             <div class="col-lg-12 col-md-6 col-sm-6">
                                 <div class="banner banner-overlay banner-3">
-                                    <a href="#">
+                                    <a :href="getBanner[2].url">
                                         <img
-                                            v-lazy="'./images/home/banners/banner-3.jpg'"
+                                            v-lazy="baseDomain+getBanner[2].image"
                                             width="370"
                                             height="245"
                                             alt="Banner"
                                         />
                                     </a>
 
-                                    <div class="banner-content banner-content-top">
+                                    <div v-html="getBanner[2].html" v-if="getBanner[2].html"></div>
+
+                                    <div class="banner-content banner-content-top" v-else>
                                         <h4 class="banner-subtitle text-grey">New Arrivals</h4>
 
                                         <h3 class="banner-title text-white">
-                                            Storage
-                                            <br />Boxes & Baskets
+                                            {{ getBanner[2].title }}
                                         </h3>
 
-                                        <nuxt-link
-                                            to="/shop/sidebar/3cols"
-                                            class="btn btn-outline-white banner-link"
-                                        >
+                                        <a :href="getBanner[2].url" class="btn btn-outline-white banner-link">
                                             Discover Now
                                             <i class="icon-long-arrow-right"></i>
-                                        </nuxt-link>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-12 col-md-6 col-sm-6">
+                            <div class="col-lg-12 col-md-6 col-sm-6" v-if="getBanner[3]">
                                 <div class="banner banner-overlay banner-overlay-light banner-4">
-                                    <a href="#">
+                                    <a :href="getBanner[3].url">
                                         <img
-                                            v-lazy="'./images/home/banners/banner-4.jpg'"
+                                            v-lazy="baseDomain+getBanner[3].image"
                                             width="370"
                                             height="245"
                                             alt="Banner"
                                         />
                                     </a>
 
-                                    <div class="banner-content banner-content-top">
-                                        <h4 class="banner-subtitle">On Sale</h4>
+                                    <div v-html="getBanner[3].html" v-if="getBanner[3].html"></div>
 
-                                        <h3 class="banner-title">Lamps Offer</h3>
+                                    <div class="banner-content banner-content-top" v-else>
 
-                                        <div class="banner-text">up to 30% off</div>
+                                        <h3 class="banner-title">{{ getBanner[3].title }}</h3>
 
-                                        <nuxt-link
-                                            to="/shop/sidebar/list"
-                                            class="btn btn-outline-gray banner-link"
-                                        >
+                                        <a :href="getBanner[3].url" class="btn btn-outline-gray banner-link">
                                             Shop Now
                                             <i class="icon-long-arrow-right"></i>
-                                        </nuxt-link>
+                                        </a>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-3" v-if="getBanner[5]" v-for="(item,index) in getBanner">
+                        <div class="banner banner-large banner-overlay banner-overlay-light banner-1" v-if="index > 4">
+                            <a :href="item.url">
+                                <img
+                                    v-lazy="baseDomain+item.image"
+                                    width="470"
+                                    height="510"
+                                    alt="Banner"
+                                />
+                            </a>
+                            <div v-html="item.html" v-if="item.html"></div>
+                            <div class="banner-content banner-content-top" v-else>
+
+                                <h3 class="banner-title">{{ item.title }}</h3>
+
+                                <a :href="item.url" class="btn btn-outline-gray banner-link">
+                                    Shop Now
+                                    <i class="icon-long-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -370,10 +326,7 @@
                 </div>
             </div>
         </div>
-        <div
-            class="footer-newsletter bg-image"
-            v-lazy:background-image="'./images/backgrounds/bg-2.jpg'"
-        >
+        <div class="footer-newsletter bg-image" v-lazy:background-image="'./images/backgrounds/bg-2.jpg'">
             <div class="container">
                 <div class="heading text-center">
                     <h3 class="title">Get The Latest Deals</h3>
@@ -423,13 +376,13 @@ import TopCollection from '~/components/partial/home/TopCollection';
 import BlogSection from '~/components/partial/home/BlogSection';
 import NewsletterModal from '~/components/elements/modals/NewsletterModal';
 
-import Repository, { baseUrl } from '~/repositories/repository.js';
+import Repository, { baseUrl,baseDomain } from '~/repositories/repository.js';
 import { attrFilter } from '~/utilities/common';
 import {
     carouselSettingSingle,
     carouselSettingDefault
 } from '~/utilities/carousel';
-import { homeData } from '~/utilities/data';
+// import { homeData } from '~/utilities/data';
 
 export default {
     components: {
@@ -440,11 +393,13 @@ export default {
     },
     data: function() {
         return {
+            baseDomain:baseDomain,
             loaded: false,
             products: [],
             topProducts: [],
             blogs: [],
-            carouselSetting1: {
+            showCarousel1:false,
+            carouselSetting1:{
                 ...carouselSettingSingle,
                 pagination: {
                     el: '.swiper-1 .swiper-dots',
@@ -470,32 +425,40 @@ export default {
                     }
                 }
             },
-            homeData: homeData
         };
     },
     computed: {
-        ...mapGetters('demo', ['newsletterShow'])
+        ...mapGetters('demo', ['newsletterShow']),
+        ...mapGetters('store', ['getSlider']),
+        ...mapGetters('store', ['getBrand']),
+        ...mapGetters('store', ['getBanner'])
+    },
+    watch: {
+      '$store.state.store.slider': function() {
+        
+      }
     },
     created: function() {
         // this.getProducts();
+        this.showCarousel1 = true;
     },
     mounted: function() {
-        if (this.newsletterShow) {
-            setTimeout(() => {
-                if (this.$route.path == '/' && this.newsletterShow) {
-                    this.$modal.show(
-                        NewsletterModal,
-                        {},
-                        { width: '970', height: 'auto', adaptive: true }
-                    );
-                }
-            }, 8000);
-        }
+        // if (this.newsletterShow) {
+        //     setTimeout(() => {
+        //         if (this.$route.path == '/' && this.newsletterShow) {
+        //             this.$modal.show(
+        //                 NewsletterModal,
+        //                 {},
+        //                 { width: '970', height: 'auto', adaptive: true }
+        //             );
+        //         }
+        //     }, 8000);
+        // }
     },
     methods: {
         getProducts: async function() {
             this.loaded = false;
-            await Repository.get(`${baseUrl}/demo1`)
+            await Repository.get(`${baseUrl}/product/beege-bage`)
                 .then(response => {
                     this.products = response.data.products;
                     this.topProducts = attrFilter(this.products, 'top');
