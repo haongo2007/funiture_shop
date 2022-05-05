@@ -18,17 +18,17 @@
 
                         <span class="cart-product-info">
                             <span class="cart-product-qty">{{ product.qty }}</span>
-                            x ${{ product.sale_price ? product.sale_price.toFixed(2): product.price.toFixed(2) }}
+                           
                         </span>
                     </div>
 
                     <figure class="product-image-container">
                         <nuxt-link :to="'/product/default/' + product.slug" class="product-image">
                             <img
-                                v-lazy="`${baseUrl}${product.sm_pictures[0].url}`"
+                                v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'"
                                 alt="product"
-                                :width="product.sm_pictures[0].width"
-                                :height="product.sm_pictures[0].height"
+                                width="150"
+                                height="150"
                             />
                         </nuxt-link>
                     </figure>
@@ -46,7 +46,7 @@
             <div class="dropdown-cart-total">
                 <span>Total</span>
 
-                <span class="cart-total-price">${{ priceTotal.toFixed(2) }}</span>
+                <span class="cart-total-price"></span>
             </div>
 
             <div class="dropdown-cart-action">
@@ -64,12 +64,12 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { baseUrl } from '~/repositories/repository';
+import { baseDomain } from '~/repositories/repository';
 
 export default {
     data: function() {
         return {
-            baseUrl: baseUrl
+            baseDomain: baseDomain
         };
     },
     computed: {

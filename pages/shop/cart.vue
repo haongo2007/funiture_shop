@@ -40,10 +40,10 @@
                                                         :to="'/product/default/' + product.slug"
                                                     >
                                                         <img
-                                                            v-lazy="`${baseUrl}${product.sm_pictures[0].url}`"
+                                                            v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'"
                                                             alt="Product"
-                                                            :width="product.sm_pictures[0].width"
-                                                            :height="product.sm_pictures[0].height"
+                                                            width="150"
+                                                            height="150"
                                                         />
                                                     </nuxt-link>
                                                 </figure>
@@ -55,7 +55,7 @@
                                                 </h3>
                                             </div>
                                         </td>
-                                        <td class="price-col">${{ product.price.toFixed(2) }}</td>
+                                        <td class="price-col" v-if="product.price.length">${{ product.price.toFixed(2) }}</td>
                                         <td class="quantity-col">
                                             <quantity-input
                                                 :product="product"
@@ -63,7 +63,7 @@
                                                 class="cart-product-quantity"
                                             ></quantity-input>
                                         </td>
-                                        <td class="total-col">${{ product.sum.toFixed(2) }}</td>
+                                        <td class="total-col" v-if="product.sum">${{ product.sum.toFixed(2) }}</td>
                                         <td class="remove-col">
                                             <button
                                                 @click.prevent="removeFromCart({product: product})"
@@ -117,7 +117,7 @@
                                     <tbody>
                                         <tr class="summary-subtotal">
                                             <td>Subtotal:</td>
-                                            <td>${{ priceTotal.toFixed(2) }}</td>
+                                            <td v-if="priceTotal">${{ priceTotal.toFixed(2) }}</td>
                                         </tr>
 
                                         <tr class="summary-shipping">
@@ -240,7 +240,7 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import PageHeader from '~/components/elements/PageHeader';
 import QuantityInput from '~/components/elements/QuantityInput';
-import { baseUrl } from '~/repositories/repository';
+import { baseDomain } from '~/repositories/repository';
 
 export default {
     components: {
@@ -250,7 +250,7 @@ export default {
     data: function() {
         return {
             cartItems: [],
-            baseUrl: baseUrl,
+            baseDomain: baseDomain,
             shipping: 0
         };
     },
@@ -260,6 +260,7 @@ export default {
     watch: {
         cartList: function() {
             this.cartItems = [...this.cartList];
+        console.log(this.cartItems);
         }
     },
     created: function() {

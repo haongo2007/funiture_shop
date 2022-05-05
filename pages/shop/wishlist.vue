@@ -45,7 +45,7 @@
 									<figure class="product-media">
 										<nuxt-link :to="'/product/default/' + product.slug">
 											<img
-												v-lazy="`${baseDomain}${product.pictures[0].url}`+'&w=150&h=150'"
+												v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'"
 												alt="Product"
 												width="150"
 												height="150"
