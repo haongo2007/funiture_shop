@@ -4,7 +4,7 @@
             v-on:mouseover="getCategoryChild(index,item,item.id)"
             class="item-lead"
             :class="{active: $route.query.category == item.alias}">
-            <nuxt-link :class="{'sf-with-ul': item.hasChild }" :to="'/store?category='+item.alias">{{ item.name }}</nuxt-link>
+            <nuxt-link :class="{'sf-with-ul': item.hasChild }" :to="'/shop?category='+item.alias">{{ item.name }}</nuxt-link>
             <categories-menu v-if="item.child && item.child.length > 0" :data-categories="item.child" />
         </li>
     </ul>

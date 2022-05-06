@@ -2,9 +2,9 @@
     <nav class="main-nav">
         <ul class="menu sf-arrows">
             <li class="megamenu-container" :class="{active: current=='/'}">
-                <nuxt-link to="/" class="sf-with-ul">Home</nuxt-link>
+                <nuxt-link to="/">Home</nuxt-link>
 
-                <div class="megamenu demo">
+                <!-- <div class="megamenu demo">
                     <div class="menu-col">
                         <div class="menu-title">Choose your demo</div>
 
@@ -331,12 +331,12 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </li>
             <li :class="{active: current=='shop'}">
-                <nuxt-link to="/shop/sidebar/list" class="sf-with-ul">Shop</nuxt-link>
+                <nuxt-link to="/shop">Shop</nuxt-link>
 
-                <div class="megamenu megamenu-md">
+                <!-- <div class="megamenu megamenu-md">
                     <div class="row no-gutters">
                         <div class="col-md-8">
                             <div class="menu-col">
@@ -462,7 +462,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </li>
             <li :class="{active: current=='product'}">
                 <nuxt-link
