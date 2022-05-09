@@ -28,7 +28,7 @@
                 <nuxt-link
                     :to="'/product/default/' + product.slug"
                     class="btn-product btn-cart btn-select"
-                    v-if="product.variants.length > 0"
+                    v-if="Object.keys(product.variants).length > 0"
                 >
                     <span>select options</span>
                 </nuxt-link>
@@ -70,8 +70,8 @@
             <div class="product-cat">
                 <span v-for="(cat, index) of product.category" :key="index">
                     <nuxt-link
-                        :to="{path: '/shop/sidebar/list', query: {category: cat.slug}}"
-                    >{{ cat.name }}</nuxt-link>
+                        :to="{path: '/shop?category=', query: {category: cat.alias}}"
+                    >{{ cat.descriptions_with_lang_default.title }}</nuxt-link>
                     {{ index < product.category.length - 1 ? ',' : '' }}
                 </span>
             </div>
@@ -86,7 +86,7 @@
             <template v-else>
                 <div class="product-price" v-if="minPrice == maxPrice">${{ minPrice.toFixed(2) }}</div>
                 <template v-else>
-                    <div class="product-price" v-if="product.variants.length == 0">
+                    <div class="product-price" v-if="Object.keys(product.variants).length == 0">
                         <span class="new-price">${{ minPrice.toFixed(2) }}</span>
                         <span class="old-price">${{ maxPrice.toFixed(2) }}</span>
                     </div>
@@ -105,12 +105,13 @@
                 <span class="ratings-text">( {{ product.review }} Reviews )</span>
             </div>
 
-            <div class="product-nav product-nav-dots" v-if="product.variants.length > 0">
+            <div class="product-nav product-nav-dots" 
+                v-if="Object.keys(product.variants).length > 0 && product.variants.hasOwnProperty('color') && product.variants.color.length">
                 <div class="row no-gutters">
                     <a
                         href="javascript:;"
                         :style="{'background-color': item.color}"
-                        v-for="(item, index) in product.variants"
+                        v-for="(item, index) in product.variants.color"
                         :key="index"
                     >
                         <span class="sr-only">Color name</span>
@@ -131,7 +132,7 @@ export default {
         return {
             baseDomain: baseDomain,
             maxPrice: 0,
-            minPrice: 99999
+            minPrice: 0
         };
     },
     computed: {
@@ -140,22 +141,30 @@ export default {
     },
 
     created: function() {
-        let min = this.minPrice;
-        let max = this.maxPrice;
-        this.product.variants.map(item => {
-            if (min > item.price) min = item.price;
-            if (max < item.price) max = item.price;
-        }, []);
-
-        if (this.product.variants.length == 0) {
-            min = this.product.sale_price
-                ? this.product.sale_price
-                : this.product.price;
-            max = this.product.price;
+        let max = 0;
+        let sumMax = [];
+        for(let element in this.product.variants){
+            this.product.variants[element].forEach( function(element, index) {
+                if(index == 0){
+                    max = element.price;
+                }
+                if (max < element.price) {
+                    max = element.price;
+                }
+            });
+            sumMax.push(max);
         }
-
-        this.minPrice = min;
-        this.maxPrice = max;
+        max = sumMax.reduce(function(a, b){ return a + b }, 0);
+        if (this.product.sale_price) {
+            this.promoPrice = this.product.sale_price.price_promotion;
+        }
+        if (this.product.variants.length == 0) {
+            this.minPrice = this.product.price;
+            this.maxPrice = this.product.price;
+        }else{
+            this.minPrice = this.product.price;
+            this.maxPrice = this.product.price+max;
+        }
     },
     methods: {
         ...mapActions('cart', ['addToCart']),

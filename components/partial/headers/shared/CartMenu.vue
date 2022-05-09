@@ -18,26 +18,19 @@
 
                         <span class="cart-product-info">
                             <span class="cart-product-qty">{{ product.qty }}</span>
-                           
+                            x {{ product.price }}
                         </span>
                     </div>
 
                     <figure class="product-image-container">
                         <nuxt-link :to="'/product/default/' + product.slug" class="product-image">
-                            <img
-                                v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'"
-                                alt="product"
-                                width="150"
-                                height="150"
-                            />
+                            <img v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'" alt="product" width="150" height="150" />
                         </nuxt-link>
                     </figure>
-                    <a
-                        href="#"
+                    <a href="#"
                         class="btn-remove"
                         title="Remove Product"
-                        @click.prevent="removeFromCart({product: product})"
-                    >
+                        @click.prevent="removeFromCart({product: product})" >
                         <i class="icon-close"></i>
                     </a>
                 </div>
@@ -46,7 +39,7 @@
             <div class="dropdown-cart-total">
                 <span>Total</span>
 
-                <span class="cart-total-price"></span>
+                <span class="cart-total-price">{{priceTotal}}</span>
             </div>
 
             <div class="dropdown-cart-action">

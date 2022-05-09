@@ -15,11 +15,11 @@
         </div>
 
         <template v-else>
-            <div class="product-price" v-if="product.sale_price">
-                <span class="new-price">${{ product.sale_price.price_promotion.toFixed(2) }}</span>
+            <div class="product-price" v-if="promoPrice > 0">
+                <span class="new-price">${{ promoPrice.toFixed(2) }}</span>
                 <span class="old-price">${{ product.price.toFixed(2) }}</span>
             </div>
-            <div class="product-price" v-else-if="maxPrice > minPrice">
+            <div class="product-price" v-else-if="maxPrice != minPrice">
                 <div class="product-price" >${{minPrice.toFixed(2)}} - ${{maxPrice.toFixed(2)}}</div>
             </div>
             <template v-else>
@@ -33,24 +33,23 @@
             <p>{{ product.short_desc.description }}</p>
         </div>
 
-        <template v-if="product.variants.length > 0">
-            <div class="details-filter-row details-row-size">
+        <template v-if="Object.keys(product.variants).length > 0">
+            <div class="details-filter-row details-row-size" v-if="product.variants.hasOwnProperty('color') && product.variants.color.length > 0">
                 <label>Color:</label>
 
                 <div class="product-nav product-nav-dots">
-                    <a
-                        :title="item.colorName"
+                    <a :title="item.name"
                         href="#"
-                        :class="{active: item.color == selectedVariant.color, disabled: item.disabled}"
+                        :class="{active: item.color == selectedVariant.code, disabled: item.disabled}"
                         :style="{'background-color': item.color}"
-                        v-for="(item, index) in colorArray"
+                        v-for="(item, index) in product.variants.color"
                         :key="index"
                         @click.prevent="selectColor(item)"
                     ></a>
                 </div>
             </div>
 
-            <div class="details-filter-row details-row-size">
+            <div class="details-filter-row details-row-size" v-if="product.variants.hasOwnProperty('size') && product.variants.size.length > 0">
                 <label for="size">Size:</label>
                 <div class="select-custom">
                     <select
@@ -61,10 +60,11 @@
                     >
                         <option value="null">Select a size</option>
                         <option
-                            :value="item.children+'__'+item.child_price"
-                            v-for="(item, index) in sizeArray"
+                            :selected="selectedVariant.size == item.name"
+                            :value="item.name+'__'+item.price"
+                            v-for="(item, index) in product.variants.size"
                             :key="index"
-                        >{{ item.children }}</option>
+                        >{{ item.name }}</option>
                     </select>
                 </div>
 
@@ -74,9 +74,9 @@
                 <a href="#" @click.prevent="clearSelection" v-if="showClear">clear</a>
             </div>
             <vue-slide-toggle :open="showVariationPrice">
-                <div
-                    class="product-price"
-                >${{ selectedVariant.price ? (parseInt(selectedVariant.price)+parseInt(selectedVariant.child_price)).toFixed(2) : 0 }}</div>
+                <div class="product-price" >
+                    ${{ (parseInt(selectedVariant.price_size) + parseInt(selectedVariant.price_color)).toFixed(2) }}
+                </div>
             </vue-slide-toggle>
         </template>
 
@@ -89,7 +89,7 @@
             <a
                 href="#"
                 class="btn-product btn-cart"
-                :class="{'btn-disabled': !canAddToCart(product, qty) || (product.variants.length > 0 && ! showVariationPrice) }"
+                :class="{'btn-disabled': !canAddToCart(product, qty) || (Object.keys(product.variants).length > 0 && !showVariationPrice) }"
                 @click.prevent="addCart(0)"
             >
                 <span>add to cart</span>
@@ -145,7 +145,8 @@
                 </a>
             </div>
         </div>
-        <div class="sticky-bar" v-if="isCartSticy">
+
+        <div class="sticky-bar" :class="{ stickyShow: isSticky }">
             <div class="container">
                 <div class="row">
                     <div class="col-6">
@@ -164,30 +165,55 @@
                         </h3>
                     </div>
                     <div class="col-6 justify-content-end">
-                        <div class="product-price" v-if="product.stock==0" key="outPrice">
-                            <span class="out-price">${{ product.price.toFixed(2) }}</span>
-                        </div>
+                        <template v-if="Object.keys(product.variants).length > 0">
+                            <div class="details-filter-row details-row-size" style="margin-bottom: 0px;" 
+                                v-if="product.variants.hasOwnProperty('color') && product.variants.color.length > 0">
 
-                        <template v-else>
-                            <div
-                                class="product-price"
-                                v-if="minPrice == maxPrice"
-                            >${{ minPrice.toFixed(2) }}</div>
-                            <template v-else>
-                                <div class="product-price" v-if="product.variants.length == 0">
-                                    <span class="new-price">${{ minPrice.toFixed(2) }}</span>
-                                    <span class="old-price">${{ maxPrice.toFixed(2) }}</span>
+                                <div class="product-nav product-nav-dots" style="margin-right:2rem;">
+                                    <a :title="item.name"
+                                        href="#"
+                                        :class="{active: item.color == selectedVariant.code, disabled: item.disabled}"
+                                        :style="{'background-color': item.color}"
+                                        v-for="(item, index) in product.variants.color"
+                                        :key="index"
+                                        @click.prevent="selectColor(item)"
+                                    ></a>
                                 </div>
-                                <div class="product-price" v-else >${{minPrice.toFixed(2)}} - ${{maxPrice.toFixed(2)}}</div>
-                            </template>
+                            </div>  
+
+                            <div style="margin-bottom:0px;" class="details-filter-row details-row-size" 
+                                v-if="product.variants.hasOwnProperty('size') && product.variants.size.length > 0">
+                                <div class="select-custom" style="margin-right: 2rem;">
+                                    <select
+                                        name="size"
+                                        id="size"
+                                        class="form-control"
+                                        @change="selectSize($event)"
+                                    >
+                                        <option value="null">Select a size</option>
+                                        <option
+                                            :selected="selectedVariant.size == item.name"
+                                            :value="item.name+'__'+item.price"
+                                            v-for="(item, index) in product.variants.size"
+                                            :key="index"
+                                        >{{ item.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <vue-slide-toggle :open="showVariationPrice">
+                                <div class="product-price" >
+                                ${{ (parseInt(selectedVariant.price_size)+parseInt(selectedVariant.price_color)).toFixed(2) }}
+                                </div>
+                            </vue-slide-toggle>
+                            <a style="margin-right:2rem;" href="#" @click.prevent="clearSelection" v-if="showClear">clear</a>
                         </template>
-                        <quantity-input :product="product" @change-qty="changeQty2"></quantity-input>
+                        <quantity-input :product="product" @change-qty="changeQty"></quantity-input>
                         <div class="product-details-action">
                             <a
                                 href="#"
                                 class="btn-product btn-cart"
-                                :class="{'btn-disabled': !canAddToCart(product, qty) || (product.variants.length > 0 && ! showVariationPrice) }"
-                                @click.prevent="addCart(1)"
+                                :class="{'btn-disabled': !canAddToCart(product, qty) || (Object.keys(product.variants).length > 0 && !showVariationPrice) }"
+                                @click.prevent="addCart(0)"
                             >
                                 <span>add to cart</span>
                             </a>
@@ -235,40 +261,40 @@ export default {
     },
     data: function() {
         return {
+            isSticky: false,
             baseDomain: baseDomain,
-            variationGroup: [],
-            selectableGroup: [],
-            sizeArray: [],
-            colorArray: [],
             selectedVariant: {
+                size: null,
                 color: null,
-                colorName: null,
-                price: null,
-                children: null,
-                price: null
+                code: null,
+                price_color: null,
+                price_size: null,
             },
             maxPrice: 0,
             minPrice: 0,
+            promoPrice: 0,
             qty: 1,
-            qty2: 1
         };
+    },
+    mounted: function() {
+        let stickyContent = this.$el.lastChild;
+        this.$el.style.height = stickyContent.offsetHeight + 'px';
+        window.addEventListener('scroll', this.scrollHandler, {
+            passive: true
+        });
     },
     computed: {
         ...mapGetters('cart', ['canAddToCart']),
         ...mapGetters('wishlist', ['isInWishlist']),
         ...mapGetters('compare', ['isInCompare']),
         showClear: function() {
-            return this.selectedVariant.color || this.selectedVariant.children
-                ? true
-                : false;
+            return this.checkEnought();
         },
         showVariationPrice: function() {
-            return this.selectedVariant.color && this.selectedVariant.children
-                ? true
-                : false;
+            return this.checkEnought();
         },
         isCartSticy: function() {
-            return this.$route.path.includes('/product/default');
+
         }
     },
     created: function() {
@@ -286,149 +312,106 @@ export default {
             sumMax.push(max);
         }
         max = sumMax.reduce(function(a, b){ return a + b }, 0);
-        // this.variationGroup = this.product.variants.reduce((acc, cur) => {
-        //     console.log(acc,cur);
-        //     cur.children.map(item => {
-        //         acc.push({
-        //             color: cur.color,
-        //             colorName: cur.name,
-        //             children: item.name,
-        //             child_price: item.price ?? 0,
-        //             price: cur.price,
-        //         });
-        //     });
-        //     if (min > cur.price) min = cur.price;
-        //     if (max < cur.price) max = cur.price;
-        //     return acc;
-        // }, []);
-        if (this.product.variants.length == 0) {
-            min = this.product.sale_price
-                ? this.product.sale_price.price_promotion
-                : this.product.price;
-            max = this.product.price;
+        if (this.product.sale_price) {
+            this.promoPrice = this.product.sale_price.price_promotion;
         }
-
-        this.minPrice = this.product.price;
-        this.maxPrice = this.product.price+max;
-        // this.refreshSelectableGroup();
+        if (this.product.variants.length == 0) {
+            this.minPrice = this.product.price;
+            this.maxPrice = this.product.price;
+        }else{
+            this.minPrice = this.product.price;
+            this.maxPrice = this.product.price+max;
+        }
     },
     methods: {
         ...mapActions('cart', ['addToCart']),
         ...mapActions('wishlist', ['addToWishlist']),
         ...mapActions('compare', ['addToCompare']),
-        refreshSelectableGroup: function() {
-            let tempArray = [...this.variationGroup];
-            if (this.selectedVariant.color) {
-                tempArray = this.variationGroup.reduce((acc, cur) => {
-                    if (this.selectedVariant.color !== cur.color) {
-                        return acc;
-                    }
-                    return [...acc, cur];
-                }, []);
-            }
-            this.sizeArray = tempArray.reduce((acc, cur) => {
-                if (acc.findIndex(item => item.children == cur.children) !== -1){
-                    return cur;
+        checkEnought(){
+            let flag = true;
+            for(let index in this.selectedVariant){
+                if (!this.selectedVariant[index] && this.selectedVariant[index] != 0) {
+                    flag = false;
                 }
-                return [...acc, cur];
-            }, []);
-            tempArray = [...this.variationGroup];
-            if (this.selectedVariant.children) {
-                tempArray = this.variationGroup.reduce((acc, cur) => {
-                    if (this.selectedVariant.children !== cur.children) {
-                        return acc;
-                    }
-                    return [...acc, cur];
-                }, []);
+            }
+            return flag;
+        },
+        selectColor: function(item) {            
+            if (item.color[0] == this.selectedVariant.code) {
+                this.selectedVariant.price_color = null;
+                this.selectedVariant.color = '';
+                this.selectedVariant.code = '';
+                if(Object.keys(item.children).length > 0) {
+                    delete this.product.variants.size;
+                    this.selectedVariant.price_size = 0;
+                    this.selectedVariant.size = null;
+                }
+            } else {
+                this.selectedVariant.price_color = item.price;
+                this.selectedVariant.color = item.name;
+                this.selectedVariant.code = item.color[0];
+                if(Object.keys(item.children).length > 0) {
+                    this.selectedVariant.price_size = 0;
+                    this.selectedVariant.size = null;
+                    this.product.variants.size = item.children.size;
+                }
             }
 
-            this.colorArray = this.product.variants.reduce((acc, cur) => {
-                if (tempArray.findIndex(item => item.color == cur.color) == -1) {
-                    return [
-                        ...acc,
-                        {
-                            color: cur.color,
-                            colorName: cur.name,
-                            price: 0,
-                            disabled: true
-                        }
-                    ];
-                }
-                return [
-                    ...acc,
-                    {
-                        color: cur.color,
-                        colorName: cur.name,
-                        price: cur.price,
-                        child_price: cur.children.price ?? 0,
-                        disabled: false
-                    }
-                ];
-            }, []);
-        },
-        selectColor: function(item) {
-            if (item.color == this.selectedVariant.color) {
-                this.selectedVariant = {
-                    ...this.selectedVariant,
-                    color: null,
-                    colorName: null,
-                    price: item.price,
-                    child_price: this.selectedVariant.child_price
-                };
-            } else {
-                this.selectedVariant = {
-                    ...this.selectedVariant,
-                    color: item.color,
-                    colorName: item.colorName,
-                    price: item.price,
-                    child_price: this.selectedVariant.child_price
-                };
-            }
-            this.refreshSelectableGroup();
         },
         selectSize: function(e) {
             let val = e.target.value.split('__');
-            this.selectedVariant.children = val[0];
-            this.selectedVariant.child_price = val[1];
-            if (this.selectedVariant.children == 'null') {
-                this.selectedVariant = { ...this.selectedVariant, children: null,child_price:0 };
-            }
-            this.refreshSelectableGroup();
+            this.selectedVariant.size = val[0];
+            this.selectedVariant.price_size = val[1];
         },
         changeQty: function(current) {
             this.qty = current;
         },
-        changeQty2: function(current) {
-            this.qty2 = current;
-        },
         clearSelection: function() {
             this.selectedVariant = {
                 ...this.selectedVariant,
+                size: null,
                 color: null,
-                colorName: null,
-                children: null
+                code: null,
+                price_color: null,
+                price_size: null,
             };
-            this.refreshSelectableGroup();
         },
         addCart: function(index = 0) {
             let newProduct = { ...this.product };
-            if (this.product.variants.length > 0) {
+            if (Object.keys(this.product.variants).length > 0) {
                 newProduct = {
                     ...this.product,
-                    name:
-                        this.product.name +
-                        ' - ' +
-                        this.selectedVariant.colorName +
-                        ', ' +
-                        this.selectedVariant.children,
-                    price: this.selectedVariant.price
+                    size: this.selectedVariant.size,
+                    color: this.selectedVariant.color,
+                    name: this.product.name + ' - ' + this.selectedVariant.color + ' (' + this.selectedVariant.size + ')',
+                    price: parseInt(this.product.price) + parseInt(this.selectedVariant.price_color) + parseInt(this.selectedVariant.price_size) 
                 };
             }
             this.addToCart({
                 product: newProduct,
-                qty: index == 0 ? this.qty : this.qty2
+                qty: this.qty
             });
-        }
+        },
+        scrollHandler: function() {
+            let stickyContent = this.$el.lastChild;
+            if (window.pageYOffset > 500) {
+                if (!this.isSticky) {
+                    this.isSticky = true;
+                }
+            } else if (this.isSticky) {
+                this.isSticky = false;
+            }
+        },
     }
 };
 </script>
+<style type="text/css">
+    .sticky-bar{
+        bottom: -200px;
+        transition-duration: 300ms;
+    }
+    .stickyShow{
+        transition-duration: 300ms;
+        bottom: 0px;
+    }
+</style>

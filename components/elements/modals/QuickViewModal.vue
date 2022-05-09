@@ -25,10 +25,10 @@
                                         :key="index"
                                     >
                                         <img
-                                            v-lazy="`${baseUrl}${picture.url}`"
+                                            v-lazy="`${baseDomain}${picture}`"
                                             alt="product"
-                                            :width="picture.width"
-                                            :height="picture.height"
+                                            width="150"
+                                            height="150"
                                         />
                                     </div>
                                 </div>
@@ -48,10 +48,10 @@
                                 @click.prevent="changePicture(index)"
                             >
                                 <img
-                                    v-lazy="`${baseUrl}${picture.url}`"
+                                    v-lazy="`${baseDomain}${picture[0]}`"
                                     alt="dot"
-                                    :width="picture.width"
-                                    :height="picture.height"
+                                    width="150"
+                                    height="150"
                                 />
                             </a>
                         </div>
@@ -80,7 +80,7 @@
 <script>
 import DetailOne from '~/components/partial/product/details/DetailOne';
 import { carouselSettingSingle } from '~/utilities/carousel';
-import { baseUrl } from '~/repositories/repository';
+import { baseDomain } from '~/repositories/repository';
 import { getIndex } from '~/utilities/common';
 
 export default {
@@ -92,7 +92,7 @@ export default {
     },
     data: function() {
         return {
-            baseUrl: baseUrl,
+            baseDomain: baseDomain,
             carouselSetting: {
                 ...carouselSettingSingle,
                 loop: false

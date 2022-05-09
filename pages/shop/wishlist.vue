@@ -100,8 +100,9 @@
 										<i class="icon-list-alt"></i>Select Options
 									</nuxt-link>
 									<button
+										href="#variant-modal"
 										class="btn btn-block btn-outline-primary-2"
-										@click.prevent="moveToCart({product: product})"
+										@click.prevent="openConfirmVariant(product)"
 										v-else
 									>
 										<i class="icon-cart-plus"></i>Add to Cart
@@ -109,10 +110,7 @@
 								</div>
 							</td>
 							<td class="remove-col">
-								<button
-									class="btn-remove"
-									@click.prevent="removeFromWishlist({product: product})"
-								>
+								<button class="btn-remove" @click.prevent="removeFromWishlist({product: product})">
 									<i class="icon-close"></i>
 								</button>
 							</td>
@@ -182,39 +180,128 @@
 				</div>
 			</div>
 		</div>
+		<modal name="variant-modal" >
+			<div class="modal-body m-3" v-if="Object.keys(product).length > 0">
+		        <button type="button" class="close" @click="$emit('close')">
+		            <span aria-hidden="true">
+		                <i class="icon-close"></i>
+		            </span>
+		        </button>
+
+		        <div class="form-box">
+		            <template v-if="Object.keys(product.variants).length > 0">
+			            <div class="details-filter-row details-row-size" v-if="product.variants.color.length > 0">
+			                <label>Color:</label>
+
+			                <div class="product-nav product-nav-dots">
+			                    <a :title="item.name"
+			                        href="#"
+			                        :class="{active: item.color[0] == selectedVariant.code, disabled: item.disabled}"
+			                        :style="{'background-color': item.color[0]}"
+			                        v-for="(item, index) in product.variants.color"
+			                        :key="index"
+			                        @click.prevent="selectColor(item)"
+			                    ></a>
+			                </div>
+			            </div>
+
+			            <div class="details-filter-row details-row-size" v-if="product.variants.size.length > 0">
+			                <label for="size">Size:</label>
+			                <div class="select-custom">
+			                    <select
+			                        name="size"
+			                        id="size"
+			                        class="form-control"
+			                        @change="selectSize($event)"
+			                    >
+			                        <option value="null">Select a size</option>
+			                        <option
+			                            :selected="selectedVariant.size == item.name"
+			                            :value="item.name+'__'+item.price"
+			                            v-for="(item, index) in product.variants.size"
+			                            :key="index"
+			                        >{{ item.name }}</option>
+			                    </select>
+			                </div>
+			            </div>
+			            <vue-slide-toggle :open="showVariationPrice">
+			                <div class="product-price" >
+			                    ${{ selectedVariant.price_size && selectedVariant.price_color ? (parseInt(selectedVariant.price_size)+parseInt(selectedVariant.price_color)).toFixed(2) : 0 }}
+			                </div>
+			            </vue-slide-toggle>
+			            <div class="product-details-action justify-content-center">
+				            <button
+	                            :disabled="!showVariationPrice"
+								class="btn-cart btn-product"
+	                            @click.prevent="addToCart(product)">
+								<span>add to cart</span>
+							</button>
+						</div>
+			        </template>
+		        </div>
+		    </div>
+	    </modal>
 	</main>
 </template>
 <script>
+import { VueSlideToggle } from 'vue-slide-toggle';
 import { mapGetters, mapActions } from 'vuex';
 import PageHeader from '~/components/elements/PageHeader';
 import { baseDomain } from '~/repositories/repository.js';
 
+const tempVariant = {
+            size: null,
+            color: null,
+            code: null,
+            price_color: null,
+            price_size: null,
+        };
+
 export default {
 	components: {
-		PageHeader
+		PageHeader,
+        VueSlideToggle,
 	},
 	data: function() {
 		return {
-			baseDomain: baseDomain
+			baseDomain: baseDomain,
+			product:{},
+            selectedVariant: Object.assign({},tempVariant),
 		};
 	},
 	computed: {
 		...mapGetters('wishlist', ['wishlistQty', 'wishlist']),
+        showVariationPrice: function() {
+            return this.checkEnought();
+        },
 		wishItems: function() {
 			return this.wishlist.reduce((acc, product) => {
+				let min = product.price;
 				let max = 0;
-				let min = 999999;
-				product.variants.map(item => {
-					if (min > item.price) min = item.price;
-					if (max < item.price) max = item.price;
-				}, []);
-
-				if (product.variants.length == 0) {
-					min = product.sale_price
-						? product.sale_price
-						: product.price;
-					max = product.price;
-				}
+		        let sumMax = [];
+		        if (Object.keys(product.variants).length > 0) {
+			        for(let element in product.variants){
+			            product.variants[element].forEach( function(element, index) {
+			                if(index == 0){
+			                    max = element.price;
+			                }
+			                if (max < element.price) {
+			                    max = element.price;
+			                }
+			            });
+			            sumMax.push(max);
+			        }
+		        	max = sumMax.reduce(function(a, b){ return a + b }, 0);
+			    }
+		        if (product.sale_price) {
+		            max = product.sale_price.price_promotion;
+		        }else{
+			        if (Object.keys(product.variants).length == 0) {
+			            max = product.price;
+			        }else{
+			            max = product.price+max;
+			        }
+		        }
 
 				return [
 					...acc,
@@ -225,9 +312,58 @@ export default {
 					}
 				];
 			}, []);
+
 		}
 	},
 	methods: {
+        selectColor: function(item) {
+            if (item.color[0] == this.selectedVariant.code) {
+                this.selectedVariant.price_color = 0;
+                this.selectedVariant.color = '';
+                this.selectedVariant.code = '';
+            } else {
+                this.selectedVariant.price_color = item.price;
+                this.selectedVariant.color = item.name;
+                this.selectedVariant.code = item.color[0];
+            }
+        },
+        selectSize: function(e) {
+            let val = e.target.value.split('__');
+            this.selectedVariant.size = val[0];
+            this.selectedVariant.price_size = val[1];
+        },
+        showClear: function() {
+            return this.checkEnought();
+        },
+        checkEnought(){
+            let flag = true;
+            for(let index in this.selectedVariant){
+                if (!this.selectedVariant[index] ) {
+                    flag = false;
+                }
+            }
+            return flag;
+        },
+		openConfirmVariant(product) {
+			this.product = product;
+			this.$modal.show('variant-modal');
+		},
+		addToCart(){
+			let newProduct = { ...this.product };
+            if (Object.keys(this.product.variants).length > 0) {
+                newProduct = {
+                    ...this.product,
+                    size: this.selectedVariant.size,
+                    color: this.selectedVariant.color,
+                    name: this.product.name + ' - ' + this.selectedVariant.color + ' (' + this.selectedVariant.size + ')',
+                    price: parseInt(this.product.price) + parseInt(this.selectedVariant.price_color) + parseInt(this.selectedVariant.price_size) 
+                };
+            }
+            this.product = {};
+            this.selectedVariant = Object.assign({},tempVariant);
+            this.$modal.hide('variant-modal');
+            this.moveToCart({ product: newProduct});
+		},
 		...mapActions('wishlist', ['removeFromWishlist', 'moveToCart'])
 	}
 };
