@@ -56,12 +56,13 @@
                         name="size"
                         id="size"
                         class="form-control"
-                        @change="selectSize($event)"
+                        @change="selectSize()"
+                        v-model="selectedSize"
                     >
-                        <option value="null">Select a size</option>
+                        <option value="null" :selected="selectedVariant.size == null">Select a size</option>
                         <option
                             :selected="selectedVariant.size == item.name"
-                            :value="item.name+'__'+item.price"
+                            :value="item"
                             v-for="(item, index) in product.variants.size"
                             :key="index"
                         >{{ item.name }}</option>
@@ -188,12 +189,13 @@
                                         name="size"
                                         id="size"
                                         class="form-control"
-                                        @change="selectSize($event)"
+                                        @change="selectSize()"
+                                        v-model="selectedSize"
                                     >
-                                        <option value="null">Select a size</option>
+                                        <option value="null" :selected="selectedVariant.size == null">Select a size</option>
                                         <option
                                             :selected="selectedVariant.size == item.name"
-                                            :value="item.name+'__'+item.price"
+                                            :value="item"
                                             v-for="(item, index) in product.variants.size"
                                             :key="index"
                                         >{{ item.name }}</option>
@@ -249,6 +251,14 @@ import { VueSlideToggle } from 'vue-slide-toggle';
 import QuantityInput from '~/components/elements/QuantityInput';
 import { baseDomain } from '~/repositories/repository.js';
 
+const defaultVariant = {
+        size: null,
+        color: null,
+        code: null,
+        price_color: null,
+        price_size: null,
+}
+
 export default {
     components: {
         VueSlideToggle,
@@ -261,15 +271,11 @@ export default {
     },
     data: function() {
         return {
+            parentVariant:null,
+            selectedSize:null,
             isSticky: false,
             baseDomain: baseDomain,
-            selectedVariant: {
-                size: null,
-                color: null,
-                code: null,
-                price_color: null,
-                price_size: null,
-            },
+            selectedVariant: Object.assign({},defaultVariant),
             maxPrice: 0,
             minPrice: 0,
             promoPrice: 0,
@@ -293,9 +299,6 @@ export default {
         showVariationPrice: function() {
             return this.checkEnought();
         },
-        isCartSticy: function() {
-
-        }
     },
     created: function() {
         let max = 0;
@@ -322,6 +325,9 @@ export default {
             this.minPrice = this.product.price;
             this.maxPrice = this.product.price+max;
         }
+        if (Object.keys(this.product.variants).length < 2) {
+            this.parentVariant = Object.keys(this.product.variants)[0]; 
+        }
     },
     methods: {
         ...mapActions('cart', ['addToCart']),
@@ -336,32 +342,43 @@ export default {
             }
             return flag;
         },
-        selectColor: function(item) {            
+        selectColor: function(item) {          
             if (item.color[0] == this.selectedVariant.code) {
                 this.selectedVariant.price_color = null;
                 this.selectedVariant.color = '';
                 this.selectedVariant.code = '';
-                if(Object.keys(item.children).length > 0) {
+                if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
                     delete this.product.variants.size;
                     this.selectedVariant.price_size = 0;
                     this.selectedVariant.size = null;
+                    this.selectedSize = null;
                 }
             } else {
                 this.selectedVariant.price_color = item.price;
                 this.selectedVariant.color = item.name;
                 this.selectedVariant.code = item.color[0];
-                if(Object.keys(item.children).length > 0) {
+                if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
                     this.selectedVariant.price_size = 0;
                     this.selectedVariant.size = null;
+                    this.selectedSize = null;
                     this.product.variants.size = item.children.size;
                 }
             }
-
         },
-        selectSize: function(e) {
-            let val = e.target.value.split('__');
-            this.selectedVariant.size = val[0];
-            this.selectedVariant.price_size = val[1];
+        selectSize: function() {
+            let item = this.selectedSize;
+            this.selectedVariant.price_size = item.price;
+            this.selectedVariant.size = item.name;
+            if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
+                this.product.variants.color = item.children.color;
+            }
+            if (this.parentVariant == 'size') {
+                this.selectedVariant.price_color = 0;
+                this.selectedVariant.color = null;
+                if (this.selectedSize == 'null') {
+                    delete this.product.variants.color;
+                }
+            }
         },
         changeQty: function(current) {
             this.qty = current;
@@ -375,22 +392,29 @@ export default {
                 price_color: null,
                 price_size: null,
             };
+            this.selectedSize = null;
+            if (this.parentVariant == 'size') {
+                delete this.product.variants.color;
+            }else if(this.parentVariant == 'color'){
+                delete this.product.variants.size;
+            }
         },
         addCart: function(index = 0) {
             let newProduct = { ...this.product };
             if (Object.keys(this.product.variants).length > 0) {
                 newProduct = {
                     ...this.product,
-                    size: this.selectedVariant.size,
-                    color: this.selectedVariant.color,
-                    name: this.product.name + ' - ' + this.selectedVariant.color + ' (' + this.selectedVariant.size + ')',
-                    price: parseInt(this.product.price) + parseInt(this.selectedVariant.price_color) + parseInt(this.selectedVariant.price_size) 
+                    name: this.product.name,
+                    selectedVariant: this.selectedVariant,
+                    price: parseInt(this.promoPrice ? this.promoPrice : this.product.price)
                 };
             }
             this.addToCart({
                 product: newProduct,
                 qty: this.qty
             });
+            this.selectedVariant = Object.assign({},defaultVariant);
+            this.selectedSize = null;
         },
         scrollHandler: function() {
             let stickyContent = this.$el.lastChild;

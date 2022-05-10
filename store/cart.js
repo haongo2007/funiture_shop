@@ -84,32 +84,51 @@ export const mutations = {
     [ ADD_TO_CART ] ( state, payload ) {
         var findIndex = state.data.findIndex( item => item.id == payload.product.id );
         let qty = payload.qty ? payload.qty : 1;
+        let variants = payload.product.selectedVariant;
+        variants.qty = qty;
         if ( findIndex !== -1 && payload.product.variants.length > 0 ) {
             findIndex = state.data.findIndex( item => item.name == payload.product.name );
         }
 
         if ( findIndex !== -1 ) {
+            let sumVariant = 0;
             state.data = state.data.reduce( ( acc, product, index ) => {
                 if ( findIndex == index ) {
+                    let findIndexVariant = product.variants.findIndex((item) => item.color == variants.color && item.size == variants.size);
+                    if (findIndexVariant !== -1) {// has
+                        product.variants[findIndexVariant].qty += variants.qty;
+                    } else {
+                        product.variants.push(variants);
+                    }
+                    product.variants.forEach( function(element, index) {
+                        sumVariant += (element.price_size + element.price_color) * element.qty;
+                    });
                     acc.push( {
                         ...product,
                         qty: product.qty + qty,
-                        sum: ( payload.product.sale_price ? payload.product.sale_price : payload.product.price ) * ( product.qty + qty )
+                        sum: payload.product.price * ( product.qty + qty ) + sumVariant
                     } );
                 } else {
                     acc.push( product );
                 }
-
                 return acc;
             }, [] );
         } else {
+            variants = [variants];
+            let sumVariant = 0;
+
+            variants.forEach( function(element, index) {
+                sumVariant += (element.price_size + element.price_color) * element.qty;
+            });
+
             state.data = [
                 ...state.data,
                 {
                     ...payload.product,
                     qty: qty,
-                    price: payload.product.sale_price ? payload.product.sale_price : payload.product.price,
-                    sum: qty * ( payload.product.sale_price ? payload.product.sale_price : payload.product.price )
+                    variants,
+                    price: payload.product.price,
+                    sum: qty * payload.product.price + sumVariant
                 }
             ];
         }
