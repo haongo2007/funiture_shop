@@ -5,26 +5,26 @@
         <div class="ratings-container">
             <div class="ratings">
                 <div class="ratings-val" :style="{width: product.ratings * 20 + '%'}"></div>
-                <span class="tooltip-text">{{ product.ratings.toFixed(2) }}</span>
+                <span class="tooltip-text">{{ priceConvert(product.ratings) }}</span>
             </div>
             <span class="ratings-text mt-0">( {{ product.review }} Reviews )</span>
         </div>
 
         <div class="product-price" v-if="product.stock==0" key="outPrice">
-            <span class="out-price">${{ product.price.toFixed(2) }}</span>
+            <span class="out-price">{{ priceConvert(product.price) }}</span>
         </div>
 
         <template v-else>
             <div class="product-price" v-if="promoPrice > 0">
-                <span class="new-price">${{ promoPrice.toFixed(2) }}</span>
-                <span class="old-price">${{ product.price.toFixed(2) }}</span>
+                <span class="new-price">{{ priceConvert(promoPrice) }}</span>
+                <span class="old-price">{{ priceConvert(product.price) }}</span>
             </div>
             <div class="product-price" v-else-if="maxPrice != minPrice">
-                <div class="product-price" >${{minPrice.toFixed(2)}} - ${{maxPrice.toFixed(2)}}</div>
+                <div class="product-price" >{{ priceConvert(minPrice)}} - {{ priceConvert(maxPrice)}}</div>
             </div>
             <template v-else>
                 <div class="product-price">
-                    <span class="new-price">${{ product.price.toFixed(2) }}</span>
+                    <span class="new-price">{{ priceConvert(product.price) }}</span>
                 </div>
             </template>
         </template>
@@ -76,7 +76,7 @@
             </div>
             <vue-slide-toggle :open="showVariationPrice">
                 <div class="product-price" >
-                    ${{ (parseInt(selectedVariant.price_size) + parseInt(selectedVariant.price_color)).toFixed(2) }}
+                    {{ priceConvert(parseInt(selectedVariant.price_size) + parseInt(selectedVariant.price_color)) }}
                 </div>
             </vue-slide-toggle>
         </template>
@@ -204,7 +204,7 @@
                             </div>
                             <vue-slide-toggle :open="showVariationPrice">
                                 <div class="product-price" >
-                                ${{ (parseInt(selectedVariant.price_size)+parseInt(selectedVariant.price_color)).toFixed(2) }}
+                                {{ priceConvert(parseInt(selectedVariant.price_size)+parseInt(selectedVariant.price_color)) }}
                                 </div>
                             </vue-slide-toggle>
                             <a style="margin-right:2rem;" href="#" @click.prevent="clearSelection" v-if="showClear">clear</a>
@@ -250,6 +250,7 @@ import { mapGetters, mapActions } from 'vuex';
 import { VueSlideToggle } from 'vue-slide-toggle';
 import QuantityInput from '~/components/elements/QuantityInput';
 import { baseDomain } from '~/repositories/repository.js';
+import { priceConvert } from '~/utilities/common';
 
 const defaultVariant = {
         size: null,
@@ -293,6 +294,7 @@ export default {
         ...mapGetters('cart', ['canAddToCart']),
         ...mapGetters('wishlist', ['isInWishlist']),
         ...mapGetters('compare', ['isInCompare']),
+        ...mapGetters('store', ['getCurrency']),
         showClear: function() {
             return this.checkEnought();
         },
@@ -330,6 +332,7 @@ export default {
         }
     },
     methods: {
+        priceConvert,
         ...mapActions('cart', ['addToCart']),
         ...mapActions('wishlist', ['addToWishlist']),
         ...mapActions('compare', ['addToCompare']),

@@ -11,14 +11,20 @@
         <div class="dropdown-menu dropdown-menu-right" v-if="cartList.length > 0" key="hasCart">
             <div class="dropdown-cart-products">
                 <div class="product" v-for="(product, index) in cartList" :key="index">
-                    <div class="product-cart-details">
+                    <div class="product-cart-details w-100">
                         <h4 class="product-title">
-                            <nuxt-link :to="'/product/default/' + product.slug">{{ product.name }}</nuxt-link>
+                            <nuxt-link class="txt-ellipsis" :title="product.name" :to="'/product/default/' + product.slug">{{ product.name }}</nuxt-link>
                         </h4>
 
-                        <span class="cart-product-info">
-                            <span class="cart-product-qty">{{ product.qty }}</span>
-                            x {{ product.price }}
+                        <span class="cart-product-info d-flex flex-wrap" >
+                            <span class="cart-product-qty d-flex" style="margin-bottom: 2px;" v-for="(item,index) in product.variants" :key="index">
+                                <span class="tip tip-new" style="margin-left:0;position: unset;padding:3px" :style="{'background': item.code}">
+                                    {{ item.color }} ({{ item.size }}) {{ priceConvert(parseInt(item.price_color)+parseInt(item.price_size)) }} 
+                                </span>
+                                <span class="tip tip-new" style="margin-left:0;position: unset;padding:3px">
+                                    {{ priceConvert(parseInt(item.price_color)+parseInt(item.price_size) + product.price) }} x {{ item.qty }}
+                                </span>
+                            </span>
                         </span>
                     </div>
 
@@ -39,7 +45,7 @@
             <div class="dropdown-cart-total">
                 <span>Total</span>
 
-                <span class="cart-total-price">{{priceTotal}}</span>
+                <span class="cart-total-price">{{ priceConvert(priceTotal) }}</span>
             </div>
 
             <div class="dropdown-cart-action">
@@ -58,6 +64,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import { baseDomain } from '~/repositories/repository';
+import { priceConvert } from '~/utilities/common';
 
 export default {
     data: function() {
@@ -69,7 +76,17 @@ export default {
         ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal'])
     },
     methods: {
+        priceConvert,
         ...mapActions('cart', ['removeFromCart'])
     }
 };
 </script>
+<style type="text/css">
+    .txt-ellipsis{
+        display: block!important;
+        width: 140px;
+        white-space: nowrap;
+        overflow: hidden !important;
+        text-overflow: ellipsis;
+    }
+</style>

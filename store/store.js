@@ -15,10 +15,7 @@ export const state = () => (
             name:'',
             code:''
         },
-        currency: {
-            name:'',
-            code:''
-        },
+        currency: {},
         languages: [],
         currencies: [],
         categories: [],
@@ -109,8 +106,7 @@ export const mutations = {
         state.currency.code = currencies[0].code;
     },
     [ SET_CURRENCY ] ( state,currency ) {
-        state.currency.name = state.currencies.filter((item) => item.code == currency)[0].name;
-        state.currency.code = currency;
+        state.currency = state.currencies.filter((item) => item.code == currency)[0];
     },
     [ SET_LANG ] ( state,lang ) {
         state.lang.name = state.languages.filter((item) => item.code == lang)[0].name;
@@ -129,4 +125,3 @@ export const mutations = {
         state.banner = banner;
     },
 }
-

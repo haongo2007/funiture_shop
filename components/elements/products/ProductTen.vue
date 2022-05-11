@@ -80,27 +80,27 @@
             </h3>
 
             <div class="product-price" v-if="product.stock==0" key="outPrice">
-                <span class="out-price">${{ product.price.toFixed(2) }}</span>
+                <span class="out-price">{{ priceConvert(product.price) }}</span>
             </div>
 
             <template v-else>
-                <div class="product-price" v-if="minPrice == maxPrice">${{ minPrice.toFixed(2) }}</div>
+                <div class="product-price" v-if="minPrice == maxPrice">{{ priceConvert(minPrice) }}</div>
                 <template v-else>
                     <div class="product-price" v-if="Object.keys(product.variants).length == 0">
-                        <span class="new-price">${{ minPrice.toFixed(2) }}</span>
-                        <span class="old-price">${{ maxPrice.toFixed(2) }}</span>
+                        <span class="new-price">{{ priceConvert(minPrice) }}</span>
+                        <span class="old-price">{{ priceConvert(maxPrice) }}</span>
                     </div>
                     <div
                         class="product-price"
                         v-else
-                    >${{minPrice.toFixed(2)}}&ndash;${{maxPrice.toFixed(2)}}</div>
+                    >{{ priceConvert(minPrice) }} - {{ priceConvert(maxPrice) }}</div>
                 </template>
             </template>
 
             <div class="ratings-container">
                 <div class="ratings">
                     <div class="ratings-val" :style="{width: product.ratings * 20 + '%'}"></div>
-                    <span class="tooltip-text">{{ product.ratings.toFixed(2) }}</span>
+                    <span class="tooltip-text">{{ priceConvert(product.ratings) }}</span>
                 </div>
                 <span class="ratings-text">( {{ product.review }} Reviews )</span>
             </div>
@@ -124,6 +124,7 @@
 <script>
 import { baseDomain } from '~/repositories/repository.js';
 import { mapGetters, mapActions } from 'vuex';
+import { priceConvert } from '~/utilities/common';
 export default {
     props: {
         product: Object
@@ -167,6 +168,7 @@ export default {
         }
     },
     methods: {
+        priceConvert,
         ...mapActions('cart', ['addToCart']),
         ...mapActions('wishlist', ['addToWishlist']),
         quickView: function() {

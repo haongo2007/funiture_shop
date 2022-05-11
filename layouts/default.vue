@@ -117,9 +117,19 @@ export default {
                     this.head.titleTemplate = this.titlePage();
                     this.head.title = this.titlePage();
                     // set cookie
-                    Cookies.set('f-store', this.info().id);
-                    Cookies.set('f-language', this.getLang.code);
-                    Cookies.set('f-currency', this.getCurrency.code);
+                    if (!Cookies.get('f-store')) {
+                        Cookies.set('f-store', this.info().id);
+                    }
+                    if (!Cookies.get('f-language')) {
+                        Cookies.set('f-language', this.getLang.code);  
+                    }else{                        
+                        this.$store.dispatch('store/setLang',Cookies.get('f-language'));
+                    }
+                    if (!Cookies.get('f-currency')) {
+                        Cookies.set('f-currency', this.getCurrency.code);
+                    }else{                        
+                        this.$store.dispatch('store/setCurrency',Cookies.get('f-currency'));
+                    }
                     
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));

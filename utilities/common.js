@@ -1,3 +1,4 @@
+
 /**
  * utils to detect safari browser
  * @return {bool}
@@ -178,4 +179,10 @@ export const mobileMenu = function () {
             e.preventDefault();
         } );
     }
+}
+
+export const priceConvert = function(price) {
+    let currency = window.$nuxt.$store.state.store.currency;
+    price = price * currency.exchange_rate;
+    return currency.symbol+price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, currency.thousands);
 }
