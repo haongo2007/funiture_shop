@@ -1,3 +1,6 @@
+import Repository, { baseUrl } from '~/repositories/repository.js';
+import Cookies from 'js-cookie';
+
 export const SET_INFO = 'SET_INFO';
 export const SET_LANGUAGES = 'SET_LANGUAGES';
 export const SET_CURRENCIES = 'SET_CURRENCIES';
@@ -89,6 +92,35 @@ export const actions = {
     setBannerHome:function ({commit},banner){
         commit( SET_BANNER, banner );
     },
+    getInfoStore:function ({ getters, dispatch }){
+        Repository.get(`${baseUrl}/store/getInfo`)
+        .then(response => {
+            dispatch('setInfoStore',response.data.data.store)
+            dispatch('setLanguages',response.data.data.languages)
+            dispatch('setCurrencies',response.data.data.currencies)
+            dispatch('setCategories',response.data.data.categories)
+            dispatch('setSlideHome',response.data.data.slider)
+            dispatch('setBrandHome',response.data.data.brands)
+            dispatch('setBannerHome',response.data.data.banner)
+            // set cookie
+
+            if (!Cookies.get('f-store')) {
+                Cookies.set('f-store', getters.info.id);
+            }
+            if (!Cookies.get('f-language')) {
+                Cookies.set('f-language', getters.getLang.code);  
+            }else{                        
+                this.$store.dispatch('store/setLang',Cookies.get('f-language'));
+            }
+            if (!Cookies.get('f-currency')) {
+                Cookies.set('f-currency', getters.getCurrency.code);
+            }else{                        
+                dispatch('setCurrency',Cookies.get('f-currency'));
+            }
+            
+        })
+        .catch(error => ({ error: JSON.stringify(error) }));
+    }
 }
 
 export const mutations = {

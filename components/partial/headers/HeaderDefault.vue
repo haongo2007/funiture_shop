@@ -179,6 +179,10 @@ export default {
 		changeLanguage(code){
 			Cookies.set('f-language',code);
             this.$store.dispatch('store/setLang',code);
+            this.$router.replace({
+	        	path: '/redirect' + this.$route.fullPath,
+	      	});
+            this.$store.dispatch('store/getInfoStore');
 		},
 		openSignInModal() {
 			this.$modal.show(

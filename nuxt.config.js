@@ -87,7 +87,7 @@ export default {
     modules: [ '@nuxtjs/axios' ],
 
     axios: {
-        proxy: true // Can be also an object with default options
+        proxy: true, 
     },
 
     proxy: {
@@ -97,7 +97,7 @@ export default {
     router: {
         base: '/',
         linkActiveClass: 'link-active',
-        linkExactActiveClass: 'active'
+        linkExactActiveClass: 'active',
     },
 
     pageTransition: 'page',
@@ -116,5 +116,5 @@ export default {
     server: {
         port: 4000,
         host: 'localhost'
-    }
+    },
 };

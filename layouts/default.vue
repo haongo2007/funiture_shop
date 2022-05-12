@@ -17,9 +17,7 @@
 import HeaderDefault from '~/components/partial/headers/HeaderDefault';
 import FooterDefault from '~/components/partial/footers/FooterDefault';
 import { isSafariBrowser, isEdgeBrowser } from '~/utilities/common';
-import Repository, { baseUrl } from '~/repositories/repository.js';
 import { mapGetters, mapActions } from 'vuex';
-import Cookies from 'js-cookie';
 export default {
     head() {
         return Object.assign({},this.head);
@@ -74,8 +72,12 @@ export default {
             },
             false
         );
-        if (Object.keys(this.info()).length === 0 ) {
-            this.getInfoStore();
+        if (Object.keys(this.info()).length === 0) {
+            this.$store.dispatch('store/getInfoStore').then(response => {
+                // set meta
+                this.head.titleTemplate = this.titlePage();
+                this.head.title = this.titlePage();
+            });
         }
     },
     computed:{
@@ -103,37 +105,6 @@ export default {
         hideMobileMenu: function() {
             document.querySelector('body').classList.remove('mmenu-active');
         },
-        getInfoStore(){
-            Repository.get(`${baseUrl}/store/getInfo`)
-                .then(response => {
-                    this.$store.dispatch('store/setInfoStore',response.data.data.store);
-                    this.$store.dispatch('store/setLanguages',response.data.data.languages);
-                    this.$store.dispatch('store/setCurrencies',response.data.data.currencies);
-                    this.$store.dispatch('store/setCategories',response.data.data.categories);
-                    this.$store.dispatch('store/setSlideHome',response.data.data.slider);
-                    this.$store.dispatch('store/setBrandHome',response.data.data.brands);
-                    this.$store.dispatch('store/setBannerHome',response.data.data.banner);
-                    // set meta
-                    this.head.titleTemplate = this.titlePage();
-                    this.head.title = this.titlePage();
-                    // set cookie
-                    if (!Cookies.get('f-store')) {
-                        Cookies.set('f-store', this.info().id);
-                    }
-                    if (!Cookies.get('f-language')) {
-                        Cookies.set('f-language', this.getLang.code);  
-                    }else{                        
-                        this.$store.dispatch('store/setLang',Cookies.get('f-language'));
-                    }
-                    if (!Cookies.get('f-currency')) {
-                        Cookies.set('f-currency', this.getCurrency.code);
-                    }else{                        
-                        this.$store.dispatch('store/setCurrency',Cookies.get('f-currency'));
-                    }
-                    
-                })
-                .catch(error => ({ error: JSON.stringify(error) }));
-        }
     }
 };
 </script>

@@ -6,7 +6,7 @@ const domainPrefix = 'api';
 
 export const customHeaders = {
     'Content-Type': 'application/json',
-    Accept: 'application/json',
+    'Accept': 'application/json',
 };
 
 export const baseDomain = `${domain}`;
@@ -16,6 +16,7 @@ export const baseUrl = `${domain}`+`${domainPrefix}`;
 
 // Create axios instance
 const service = axios.create({
+  withCredentials:true,
   baseUrl,
   headers: customHeaders,
   timeout: 10000, // Request timeout

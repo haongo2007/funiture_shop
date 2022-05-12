@@ -19,19 +19,18 @@
             <div class="checkout">
                 <div class="container">
                     <div class="checkout-discount">
-                        <form action="#">
-                            <input
-                                type="text"
-                                class="form-control"
-                                required
-                                id="checkout-discount-input"
-                                @click="clickCoupon($event)"
-                            />
-                            <label for="checkout-discount-input" class="text-truncate">
-                                Have a coupon?
-                                <span>Click here to enter your code</span>
-                            </label>
-                        </form>
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="coupon"
+                            required
+                            id="checkout-discount-input"
+                            @click="clickCoupon()"
+                        />
+                        <label for="checkout-discount-input" class="text-truncate">
+                            Have a coupon?
+                            <span>Click here to enter your code</span>
+                        </label>
                     </div>
 
                     <form action="#">
@@ -306,7 +305,8 @@ export default {
     },
     data: function() {
         return {
-            toggleState: [true, false, false, false, false]
+            toggleState: [true, false, false, false, false],
+            coupon:'',
         };
     },
     computed: {

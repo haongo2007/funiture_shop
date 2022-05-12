@@ -346,7 +346,7 @@ export default {
             return flag;
         },
         selectColor: function(item) {          
-            if (item.color[0] == this.selectedVariant.code) {
+            if (item.color != null && item.color[0] == this.selectedVariant.code) {
                 this.selectedVariant.price_color = null;
                 this.selectedVariant.color = '';
                 this.selectedVariant.code = '';
@@ -359,7 +359,7 @@ export default {
             } else {
                 this.selectedVariant.price_color = item.price;
                 this.selectedVariant.color = item.name;
-                this.selectedVariant.code = item.color[0];
+                this.selectedVariant.code = item.color != null ? item.color[0] : '';
                 if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
                     this.selectedVariant.price_size = 0;
                     this.selectedVariant.size = null;

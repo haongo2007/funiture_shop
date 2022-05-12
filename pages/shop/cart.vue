@@ -78,24 +78,23 @@
 
                             <div class="cart-bottom">
                                 <div class="cart-discount">
-                                    <form action="#">
-                                        <div class="input-group">
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                required
-                                                placeholder="coupon code"
-                                            />
-                                            <div class="input-group-append">
-                                                <button
-                                                    class="btn btn-outline-primary-2"
-                                                    type="submit"
-                                                >
-                                                    <i class="icon-long-arrow-right"></i>
-                                                </button>
-                                            </div>
+                                    <div class="input-group">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            v-model="coupon"
+                                            required
+                                            placeholder="coupon code"
+                                        />
+                                        <div class="input-group-append">
+                                            <button
+                                                class="btn btn-outline-primary-2"
+                                                @click="clickCoupon()"
+                                            >
+                                                <i class="icon-long-arrow-right"></i>
+                                            </button>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
 
                                 <a
@@ -240,7 +239,7 @@
 import { mapGetters, mapActions, mapMutations } from 'vuex';
 import PageHeader from '~/components/elements/PageHeader';
 import QuantityInput from '~/components/elements/QuantityInput';
-import { baseDomain } from '~/repositories/repository';
+import Repository,{ baseDomain,baseUrl } from '~/repositories/repository';
 
 export default {
     components: {
@@ -251,7 +250,8 @@ export default {
         return {
             cartItems: [],
             baseDomain: baseDomain,
-            shipping: 0
+            shipping: 0,
+            coupon:''
         };
     },
     computed: {
@@ -285,6 +285,16 @@ export default {
                     ];
                 return [...acc, cur];
             }, []);
+        },
+        async clickCoupon(){
+            await Repository.post(
+                `${baseUrl}/discount/checkCoupon`,
+                this.coupon,
+            )
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => ({ error: JSON.stringify(error) }));
         }
     }
 };
