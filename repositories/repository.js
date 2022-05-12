@@ -34,6 +34,9 @@ service.interceptors.request.use(
     if (Cookies.get('f-currency')) {
       config.headers['x-currency'] = Cookies.get('f-currency'); // Set store
     }
+    if (Cookies.get('f-token')) {
+      config.headers['Authorization'] = "Bearer "+Cookies.get('f-token'); // Set token
+    }
     return config;
   },
   error => {

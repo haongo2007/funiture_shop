@@ -22,39 +22,19 @@ export const actions = {
     addToCompare: function ( { commit, getters }, payload ) {
         if ( getters.isInCompare( payload.product ) ) {
             this._vm.$vToastify.removeToast();
-            this._vm.$vToastify.setSettings( {
-                withBackdrop: false,
-                position: "top-right",
-                errorDuration: 2000
-            } );
             this._vm.$vToastify.error( "Product has already been in Compare." );
             return;
         }
 
         commit( ADD_TO_COMPARE, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product added to compare" );
     },
     removeFromCompare: function ( { commit }, payload ) {
         commit( REMOVE_FROM_COMPARE, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product removed from compare" );
     },
     clearCompare: function ( { commit } ) {
         commit( CLEAR_COMPARE );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Compare list cleared" );
     }
 }

@@ -35,9 +35,11 @@
                             </div>
 
                             <div class="form-footer">
-                                <button type="button" @click="submitForm()" class="btn btn-outline-primary-2">
-                                    <span>LOG IN</span>
-                                    <i class="icon-long-arrow-right"></i>
+                                <button type="button" @click="submitForm()" class="btn btn-outline-primary-2" :disabled="loginState">
+                                    <div class="spinner-border" role="status" v-if="loginState">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span v-else>LOG IN <i class="icon-long-arrow-right"></i></span>
                                 </button>
 
                                 <div class="custom-control custom-checkbox">
@@ -87,6 +89,7 @@
 <script>
 import Tabs from '~/components/elements/Tabs';
 import Repository,{ baseDomain,baseUrl } from '~/repositories/repository';
+import Cookies from 'js-cookie';
 export default {
     components: {
         Tabs
@@ -108,16 +111,31 @@ export default {
                 email:'',
                 password:'',
                 remember:false,
-            }
+            },
+            loginState:false,
         };
     },
     methods:{
         async submitForm(){
+            if (this.temp.email != '' && this.temp.password != '') {
+                this.loginState = true;
+            }else{
+                return false;
+            }
             await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
                 Repository.post(`${baseUrl}/auth/login`,this.temp).then(({data})=>{
-                    console.log(data);
-                }).catch(({response:{data}})=>{
-                    console.log(data);
+                    
+                    if (data.access_token) {
+                        Cookies.set('f-token',data.access_token);
+                        this.$store.dispatch('customer/setToken',data.access_token);
+                        this.$store.dispatch('customer/getCustomer');
+                        
+                        this.$vToastify.success( "successful login" );
+                    }
+                    this.$emit('close')
+                    this.loginState = false;
+                }).catch((error)=>{
+                    console.log(error);
                 })
             })
         }

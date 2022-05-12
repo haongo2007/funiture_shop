@@ -23,30 +23,15 @@ export const getters = {
 export const actions = {
     addToWishlist: function ( { commit }, payload ) {
         commit( ADD_TO_WISHLIST, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product added to wishlist" );
     },
     removeFromWishlist: function ( { commit }, payload ) {
         commit( REMOVE_FROM_WISHLIST, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product removed from wishlist" );
     },
     moveToCart: function ( { commit }, payload ) {
         commit( REMOVE_FROM_WISHLIST, payload );
         this.commit( 'cart/ADD_TO_CART', { product: payload.product, qty: 1 } );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product moved to cart" );
     }
 }

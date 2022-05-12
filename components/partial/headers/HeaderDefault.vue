@@ -38,11 +38,17 @@
 										</div>
 									</div>
 								</li>
-								<li>
+								<li v-if="!getToken">
 									<a
 										href="#signin-modal"
 										@click.prevent="openSignInModal"
 									>Sign in / Sign up</a>
+								</li>
+								<li v-else>
+									<a
+										href="javascript:;"
+										@click.prevent="handleLogout"
+									>Logout <i class="icon-long-arrow-right"></i></a>
 								</li>
 							</ul>
 						</li>
@@ -81,7 +87,7 @@
 				</div>
 
 				<div class="header-right">
-					<div class="account">
+					<div class="account" v-if="Object.keys(getCurrentCustomer).length > 0">
 						<nuxt-link
 							to="/shop/dashboard"
 							title="My account"
@@ -161,6 +167,8 @@ export default {
         ...mapGetters('store', ['getLang']),
         ...mapGetters('store', ['getCurrency']),
         ...mapGetters('store', ['getCategories']),
+        ...mapGetters('customer', ['getToken']),
+        ...mapGetters('customer', ['getCurrentCustomer']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
 		},
@@ -193,6 +201,10 @@ export default {
 		},
 		openMobileMenu: function() {
 			document.querySelector('body').classList.add('mmenu-active');
+		},
+		handleLogout: function() {
+            this.$store.dispatch('customer/logout');
+        	this.$vToastify.success( "successful logout" );
 		}
 	}
 };

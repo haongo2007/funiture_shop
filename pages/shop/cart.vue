@@ -88,10 +88,13 @@
                                         />
                                         <div class="input-group-append">
                                             <button
+                                                :disabled="checkedCoupon"
                                                 class="btn btn-outline-primary-2"
-                                                @click="clickCoupon()"
-                                            >
-                                                <i class="icon-long-arrow-right"></i>
+                                                @click="clickCoupon()">
+                                                <div class="spinner-border" role="status" v-if="checkedCoupon">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                                <i class="icon-long-arrow-right" v-else></i>
                                             </button>
                                         </div>
                                     </div>
@@ -248,6 +251,7 @@ export default {
     },
     data: function() {
         return {
+            checkedCoupon:false,
             cartItems: [],
             baseDomain: baseDomain,
             shipping: 0,
@@ -287,14 +291,21 @@ export default {
             }, []);
         },
         async clickCoupon(){
-            await Repository.post(
-                `${baseUrl}/discount/checkCoupon`,
-                this.coupon,
-            )
-            .then(response => {
-                console.log(response);
+            if (this.coupon != '') {
+                this.checkedCoupon = true;
+            }else{
+                return false;
+            }
+            await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
+                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon}).then(({data})=>{
+                    if (data) {
+                        this.checkedCoupon = false;
+                        
+                    }
+                }).catch(({response:{data}})=>{
+                    console.log(data);
+                })
             })
-            .catch(error => ({ error: JSON.stringify(error) }));
         }
     }
 };

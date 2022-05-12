@@ -43,39 +43,19 @@ export const actions = {
     addToCart: function ( { commit, getters }, payload ) {
         if ( !getters.canAddToCart( payload.product, payload.qty ) ) {
             this._vm.$vToastify.removeToast();
-            this._vm.$vToastify.setSettings( {
-                withBackdrop: false,
-                position: "top-right",
-                errorDuration: 2000
-            } );
             this._vm.$vToastify.error( "Sorry, you can't add that amount to the cart." );
             return;
         }
 
         commit( ADD_TO_CART, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product added to cart" );
     },
     removeFromCart: function ( { commit }, payload ) {
         commit( REMOVE_FROM_CART, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Product removed from cart" );
     },
     updateCart: function ( { commit }, payload ) {
         commit( UPDATE_CART, payload );
-        this._vm.$vToastify.setSettings( {
-            withBackdrop: false,
-            position: "top-right",
-            successDuration: 1500,
-        } );
         this._vm.$vToastify.success( "Cart successfully updated" );
     }
 }
