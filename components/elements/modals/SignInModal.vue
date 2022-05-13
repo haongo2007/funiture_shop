@@ -126,7 +126,6 @@ export default {
                 Repository.post(`${baseUrl}/auth/login`,this.temp).then(({data})=>{
                     
                     if (data.access_token) {
-                        Cookies.set('f-token',data.access_token);
                         this.$store.dispatch('customer/setToken',data.access_token);
                         this.$store.dispatch('customer/getCustomer');
                         

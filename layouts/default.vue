@@ -18,6 +18,8 @@ import HeaderDefault from '~/components/partial/headers/HeaderDefault';
 import FooterDefault from '~/components/partial/footers/FooterDefault';
 import { isSafariBrowser, isEdgeBrowser } from '~/utilities/common';
 import { mapGetters, mapActions } from 'vuex';
+import Cookies from 'js-cookie';
+
 export default {
     head() {
         return Object.assign({},this.head);
@@ -78,6 +80,10 @@ export default {
                 this.head.titleTemplate = this.titlePage();
                 this.head.title = this.titlePage();
             });
+        }
+        if (Cookies.get('f-token')) {
+            this.$store.dispatch('customer/setToken',Cookies.get('f-token'));
+            this.$store.dispatch('customer/getCustomer');
         }
     },
     computed:{

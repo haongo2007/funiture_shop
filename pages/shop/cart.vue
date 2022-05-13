@@ -75,7 +75,17 @@
                                     </tr>
                                 </tbody>
                             </table>
-
+                            <div class="cart-top">
+                                <div class="coupon mb-1" v-for="item in couponInUse" :key="item.id">
+                                    <div class="coupon-info">
+                                        <div>{{ item.code }}</div>
+                                        <div class="border-ticket"></div>
+                                    </div>
+                                    <div class="coupon-desc">
+                                        {{ item.data }}
+                                    </div>
+                                </div>
+                            </div>
                             <div class="cart-bottom">
                                 <div class="cart-discount">
                                     <div class="input-group">
@@ -255,7 +265,8 @@ export default {
             cartItems: [],
             baseDomain: baseDomain,
             shipping: 0,
-            coupon:''
+            coupon:'',
+            couponInUse:[],
         };
     },
     computed: {
@@ -264,7 +275,6 @@ export default {
     watch: {
         cartList: function() {
             this.cartItems = [...this.cartList];
-        console.log(this.cartItems);
         }
     },
     created: function() {
@@ -300,7 +310,8 @@ export default {
                 Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon}).then(({data})=>{
                     if (data) {
                         this.checkedCoupon = false;
-                        
+                        this.couponInUse.push(data.data);
+                        this.$vToastify.success( data.msg );
                     }
                 }).catch(({response:{data}})=>{
                     console.log(data);
@@ -310,3 +321,34 @@ export default {
     }
 };
 </script>
+<style type="text/css">
+    .coupon {
+        display: flex;
+        width: 30%;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #a6c76c;
+        border-left: 0;
+    }
+    .coupon .coupon-info{
+        color: #fff;
+        margin-left: 3px;
+        background: #a6c76c;
+        position: relative;
+        padding: 2px 5px 2px 10px;
+        border-right: 1px solid #a6c76c;
+    }
+    .coupon .coupon-info .border-ticket{
+        top: 0;
+        width: 5px;
+        height: 100%;
+        left: -3px;
+        position: absolute;
+        background: radial-gradient(circle at 0 0.25rem,transparent 0,transparent 0.2rem,#a6c76c 0);
+        background-size: 0.3rem 0.6rem;
+        background-repeat: repeat-y;
+    }
+    .coupon .coupon-desc{
+        margin-right: 10px;
+    }
+</style>

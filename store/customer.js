@@ -22,6 +22,7 @@ export const getters = {
 
 export const actions = {
     setToken: function ( { commit }, token ) {
+        Cookies.set('f-token',token);
         commit( SET_TOKEN, token );
     },
     // get info customer

@@ -55,6 +55,12 @@ export const actions = {
         this._vm.$vToastify.success( "Product removed from cart" );
     },
     updateCart: function ( { commit }, payload ) {
+        payload.cartItems.forEach((item,key)=>{
+            if(item.qty == 0){
+                commit( REMOVE_FROM_CART, {product : item} );
+                delete payload.cartItems[key];
+            }
+        })
         commit( UPDATE_CART, payload );
         this._vm.$vToastify.success( "Cart successfully updated" );
     }
