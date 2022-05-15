@@ -82,6 +82,8 @@ export default {
         { src: '~/plugins/lazyLoad.js', ssr: false },
         { src: '~/plugins/toastify.js', ssr: false },
         { src: '~/plugins/nouislider.js', ssr: false },
+        { src: '~/plugins/debounce.js', ssr: false },
+        { src: '~/plugins/validate.js', ssr: false },
     ],
 
     modules: [ '@nuxtjs/axios' ],

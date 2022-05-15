@@ -7,10 +7,9 @@
                     <li class="breadcrumb-item">
                         <nuxt-link to="/">Home</nuxt-link>
                     </li>
-                    <li class="breadcrumb-item">
-                        <nuxt-link to="/shop/sidebar/list">Shop</nuxt-link>
+                    <li class="breadcrumb-item active">
+                        Shop
                     </li>
-                    <li class="breadcrumb-item active">{{ head.title }}</li>
                     <li class="breadcrumb-item" v-if="$route.query.searchTerm">
                         <span>Search - {{ $route.query.searchTerm }}</span>
                     </li>
@@ -25,13 +24,6 @@
                         <a href="#" class="sidebar-toggler mr-0 mr-md-5" @click.prevent="showSidebar">
                             <i class="icon-bars"></i>Filters
                         </a>
-                    </div>
-
-                    <div class="toolbox-center">
-                        <div class="toolbox-info">
-                            Showing
-                            <span>{{ products.length }} of {{ totalCount }}</span> Products
-                        </div>
                     </div>
                     <div class="toolbox-right">
                         <div class="toolbox-sort">
@@ -51,16 +43,80 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="toolbox-layout">
+                            <a
+                                href="javascript:;"
+                                @click="changeView('list')"
+                                class="btn-layout"
+                                :class="{active: type == 'list'}"
+                            >
+                                <svg width="16" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="10" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="10" height="4" />
+                                </svg>
+                            </a>
+
+                            <a
+                                href="javascript:;"
+                                @click="changeView('2cols')"
+                                class="btn-layout"
+                                :class="{active: type == '2cols'}"
+                            >
+                                <svg width="10" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="4" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="4" height="4" />
+                                </svg>
+                            </a>
+
+                            <a
+                                href="javascript:;"
+                                @click="changeView('3cols')"
+                                class="btn-layout"
+                                :class="{active: type == '3cols'}"
+                            >
+                                <svg width="16" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="4" height="4" />
+                                    <rect x="12" y="0" width="4" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="4" height="4" />
+                                    <rect x="12" y="6" width="4" height="4" />
+                                </svg>
+                            </a>
+
+                            <a
+                                @click="changeView('4cols')"
+                                href="javascript:;"
+                                class="btn-layout"
+                                :class="{active: type == '4cols'}"
+                            >
+                                <svg width="22" height="10">
+                                    <rect x="0" y="0" width="4" height="4" />
+                                    <rect x="6" y="0" width="4" height="4" />
+                                    <rect x="12" y="0" width="4" height="4" />
+                                    <rect x="18" y="0" width="4" height="4" />
+                                    <rect x="0" y="6" width="4" height="4" />
+                                    <rect x="6" y="6" width="4" height="4" />
+                                    <rect x="12" y="6" width="4" height="4" />
+                                    <rect x="18" y="6" width="4" height="4" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <shop-list-three
+                <shop-list-one
                     :products="products"
                     :per-page="perPage"
                     :loaded="loaded"
                     :class="{loaded: loaded}"
+                    :type="type"
                     class="skeleton-body skel-shop-products"
-                ></shop-list-three>
+                ></shop-list-one>
 
                 <div class="load-more-container text-center">
                     <a
@@ -86,7 +142,7 @@
 import { mapGetters } from 'vuex';
 
 import PageHeader from '~/components/elements/PageHeader';
-import ShopListThree from '~/components/partial/shop/list/ShopListThree';
+import ShopListOne from '~/components/partial/shop/list/ShopListOne';
 import ShopSidebarOne from '~/components/partial/shop/sidebar/ShopSidebarOne';
 
 import Repository, { baseUrl } from '~/repositories/repository.js';
@@ -95,7 +151,7 @@ import { scrollToPageContent } from '~/utilities/common';
 export default {
     components: {
         PageHeader,
-        ShopListThree,
+        ShopListOne,
         ShopSidebarOne
     },
     head() {
@@ -120,8 +176,8 @@ export default {
             },
             pageTitle:'Shop',
             products: [],
-            perPage: 8,
-            type: 'list',
+            perPage: 12,
+            type: '4cols',
             totalCount: 0,
             orderBy: 'default',
             isSidebar: true,
@@ -131,11 +187,6 @@ export default {
     },
     computed: {
         ...mapGetters('store', ['titlePage']),
-        ...mapGetters('demo', ['currentDemo']),
-        // pageTitle: function() {
-        //     if (this.$route.params.type == 'boxed') return 'Boxed No Sidebar';
-        //     else return 'Fullwidth No Sidebar';
-        // },
         containerClass: function() {
             if (this.$route.params.type == 'fullwidth')
                 return 'container-fluid';
@@ -157,6 +208,18 @@ export default {
       console.log('destroyed')
     },
     methods: {
+        changeView(type){
+            this.type = type;
+            if (type == 'list') {
+                this.perPage = 5;
+            } else if (type == '2cols') {
+                this.perPage = 6;
+            } else if (type == '3cols') {
+                this.perPage = 9;
+            } else if (type == '4cols') {
+                this.perPage = 12;
+            }
+        },
         getProducts: async function(samePage = false, loadMore = false) {
             if (!loadMore) this.loaded = false;
             await Repository.get(`${baseUrl}/product`, {
@@ -167,8 +230,8 @@ export default {
                 }
             })
                 .then(response => {
-                    this.products = response.data.data;
-                    this.totalCount = response.data.meta.total;
+                    this.products = response.data;
+                    this.totalCount = response.meta.total;
 
                     this.head.titleTemplate = this.pageTitle+' | ' + this.titlePage;
                     this.head.title =  this.pageTitle+' | ' + this.titlePage;
@@ -179,6 +242,7 @@ export default {
                     }
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));
+
         },
         toggleSidebar: function() {
             if (

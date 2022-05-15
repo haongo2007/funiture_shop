@@ -3,6 +3,6 @@ import VueToastify from "vue-toastify";
 
 Vue.use( VueToastify,{
             withBackdrop: false,
-            position: "top-right",
+            position: "bottom-left",
             successDuration: 1500,
         });

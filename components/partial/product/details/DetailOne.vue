@@ -124,7 +124,7 @@
                 <span>Category:</span>
                 <span v-for="(cat, index) of product.category" :key="index">
                     <nuxt-link
-                        :to="{path: '/shop/sidebar/list', query: {category: cat.alias}}"
+                        :to="{path: '/shop?category=', query: {category: cat.alias}}"
                     >{{ cat.descriptions_with_lang_default.title }}</nuxt-link>
                     {{ index < product.category.length - 1 ? ',' : '' }}
                 </span>

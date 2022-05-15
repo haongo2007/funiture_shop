@@ -90,16 +90,16 @@ export default {
                 `${baseUrl}/product/${this.$route.params.slug}`,
             )
                 .then(response => {
-                    this.product = { ...response.data.data.product };
+                    this.product = { ...response.data.product };
                     if (Object.keys(this.product).length) {
                         this.head.titleTemplate = this.product.name + ' | ' + this.titlePage();
                         this.head.title =  this.product.name + ' | ' + this.titlePage();
                     }else{
                         this.$router.push({path: '/pages/404'});
                     }
-                    this.relatedProducts = [...response.data.data.relatedProducts];
-                    this.prevProduct = response.data.data.prevProduct;
-                    this.nextProduct = response.data.data.nextProduct;
+                    this.relatedProducts = [...response.data.relatedProducts];
+                    this.prevProduct = response.data.prevProduct;
+                    this.nextProduct = response.data.nextProduct;
                     this.ProductDetail = 'DetailOne';
                     this.ProductGallery = 'GalleryVertical';
                     this.loaded = true;

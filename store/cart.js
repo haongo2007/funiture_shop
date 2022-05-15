@@ -46,7 +46,6 @@ export const actions = {
             this._vm.$vToastify.error( "Sorry, you can't add that amount to the cart." );
             return;
         }
-
         commit( ADD_TO_CART, payload );
         this._vm.$vToastify.success( "Product added to cart" );
     },

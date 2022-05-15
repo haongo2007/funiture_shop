@@ -31,7 +31,7 @@ export const actions = {
         .then(response => {
           const { data } = response;
           
-          commit('SET_CUSTOMER', data.data);
+          commit('SET_CUSTOMER', data);
         }).catch(error => {
           console.log(error);
         });

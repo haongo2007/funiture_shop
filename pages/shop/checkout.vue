@@ -25,14 +25,23 @@
                             v-model="coupon"
                             required
                             id="checkout-discount-input"
-                            @click="clickCoupon()"
+                            v-debounce:1s="applyCoupon" :debounce-events="['keyup']"
+                            @click="clickCoupon($event)"
                         />
                         <label for="checkout-discount-input" class="text-truncate">
                             Have a coupon?
                             <span>Click here to enter your code</span>
                         </label>
                     </div>
-
+                    <div class="coupon mb-1" v-for="item in invoice.couponInUse" :key="item.id">
+                        <div class="coupon-info">
+                            <div>{{ item.code }}</div>
+                            <div class="border-ticket"></div>
+                        </div>
+                        <div class="coupon-desc">
+                            {{ item.data }}
+                        </div>
+                    </div>
                     <form action="#">
                         <div class="row">
                             <div class="col-lg-9">
@@ -40,65 +49,73 @@
 
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <label>First Name *</label>
-                                        <input type="text" class="form-control" required />
+                                        <label class="required">First Name * <span>{{ errors.first('first_name') }}</span></label>
+                                        <input data-vv-as="First Name" :class="{'is-danger': errors.has('first_name') }" data-vv-validate-on="blur" v-validate="'required'" name="first_name" type="text" class="form-control" v-model="invoice.customer.first_name"/>
                                     </div>
 
                                     <div class="col-sm-6">
-                                        <label>Last Name *</label>
-                                        <input type="text" class="form-control" required />
+                                        <label class="required">Last Name * <span>{{ errors.first('last_name') }}</span></label>
+                                        <input data-vv-as="Last Name" :class="{'is-danger': errors.has('last_name') }" data-vv-validate-on="blur" v-validate="'required'" name="last_name" type="text" class="form-control" v-model="invoice.customer.last_name"/>
                                     </div>
                                 </div>
 
                                 <label>Company Name (Optional)</label>
-                                <input type="text" class="form-control" />
+                                <input type="text" class="form-control" v-model="invoice.customer.company"/>
 
-                                <label>Country *</label>
-                                <input type="text" class="form-control" required />
+                                <label class="required">Country * <span>{{ errors.first('country') }}</span></label>
+                                <input data-vv-as="Country" :class="{'is-danger': errors.has('country') }" data-vv-validate-on="blur" v-validate="'required'" name="country" type="text" class="form-control" v-model="invoice.customer.country"/>
 
-                                <label>Street address *</label>
+                                <label class="required">Street address * <span>{{ errors.first('address1') }}</span></label>
                                 <input
+                                    data-vv-as="Street address" :class="{'is-danger': errors.has('address1') }" data-vv-validate-on="blur" v-validate="'required'" name="address1" 
                                     type="text"
                                     class="form-control"
                                     placeholder="House number and Street name"
-                                    required
-                                />
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    placeholder="Appartments, suite, unit etc ..."
-                                    required
+                                    v-model="invoice.customer.address1"
                                 />
 
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <label>Town / City *</label>
-                                        <input type="text" class="form-control" required />
+                                        <label class="required">Town / City * <span>{{ errors.first('address2') }}</span></label>
+                                        <input data-vv-as="Town / City" :class="{'is-danger': errors.has('address2') }" data-vv-validate-on="blur" v-validate="'required'" name="address2" type="text" class="form-control" v-model="invoice.customer.address2"/>
                                     </div>
 
                                     <div class="col-sm-6">
-                                        <label>State / County *</label>
-                                        <input type="text" class="form-control" required />
+                                        <label class="required">State / County  * <span>{{ errors.first('address3') }}</span></label>
+                                        <input data-vv-as="State / County" :class="{'is-danger': errors.has('address3') }" data-vv-validate-on="blur" v-validate="'required'" name="address3" type="text" class="form-control" v-model="invoice.customer.address3"/>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <label>Postcode / ZIP *</label>
-                                        <input type="text" class="form-control" required />
+                                        <label class="required">Postcode / ZIP * <span>{{ errors.first('postcode') }}</span></label>
+                                        <input data-vv-as="State / County" :class="{'is-danger': errors.has('postcode') }" data-vv-validate-on="blur" v-validate="'required'" name="postcode" type="text" class="form-control" v-model="invoice.customer.postcode"/>
                                     </div>
 
                                     <div class="col-sm-6">
-                                        <label>Phone *</label>
-                                        <input type="tel" class="form-control" required />
+                                        <label class="required">Phone * <span>{{ errors.first('phone') }}</span></label>
+                                        <input data-vv-as="Phone" :class="{'is-danger': errors.has('phone') }" data-vv-validate-on="blur" v-validate="'required'" name="phone" type="tel" class="form-control" v-model="invoice.customer.phone"/>
                                     </div>
                                 </div>
 
-                                <label>Email address *</label>
-                                <input type="email" class="form-control" required />
+                                <label class="required">Email address * <span>{{ errors.first('email') }}</span></label>
+                                <input data-vv-as="Email address" :class="{'is-danger': errors.has('email') }" data-vv-validate-on="blur" v-validate="'required'" name="email" type="email" class="form-control" v-model="invoice.customer.email"/>
 
-                                <div class="custom-control custom-checkbox">
+                                <div class="row" v-if="createAccount">
+                                    <div class="col-sm-6">
+                                        <label class="required">Password * <span>{{ errors.first('password') }}</span></label>
+                                        <input data-vv-as="Password" :class="{'is-danger': errors.has('password') }" data-vv-validate-on="blur" v-validate="'required'" name="password" type="password" class="form-control" v-model="invoice.customer.password"/>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <label class="required">Password confirm * <span>{{ errors.first('password_confirm') }}</span></label>
+                                        <input data-vv-as="Password confirm" :class="{'is-danger': errors.has('password_confirm') }" data-vv-validate-on="blur" v-validate="'required'" name="password_confirm" type="password" class="form-control" v-model="invoice.customer.password_confirm"/>
+                                    </div>
+                                </div>
+
+                                <div class="custom-control custom-checkbox" v-if="Object.keys(getCurrentCustomer).length == 0">
                                     <input
+                                        v-model="createAccount"
                                         type="checkbox"
                                         class="custom-control-input"
                                         id="checkout-create-acc"
@@ -123,6 +140,7 @@
 
                                 <label>Order notes (optional)</label>
                                 <textarea
+                                    v-model="invoice.customer.notes"
                                     class="form-control"
                                     cols="30"
                                     rows="4"
@@ -143,7 +161,7 @@
                                         </thead>
 
                                         <tbody>
-                                            <tr v-for="(product, index) in cartList" :key="index">
+                                            <tr v-for="(product, index) in this.invoice.products" :key="index">
                                                 <td>
                                                     <nuxt-link
                                                         :to="'/product/default/' + product.slug"
@@ -278,8 +296,9 @@
                                     </div>
 
                                     <button
-                                        type="submit"
+                                        type="button"
                                         class="btn btn-outline-primary-2 btn-order btn-block"
+                                        @click="checkOut()"
                                     >
                                         <span class="btn-text">Place Order</span>
                                         <span class="btn-hover-text">Proceed to Checkout</span>
@@ -295,8 +314,10 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
+import Repository,{ baseUrl } from '~/repositories/repository';
 import { VueSlideToggle } from 'vue-slide-toggle';
 import PageHeader from '~/components/elements/PageHeader';
+import { ValidationProvider } from 'vee-validate';
 
 export default {
     components: {
@@ -306,13 +327,53 @@ export default {
     data: function() {
         return {
             toggleState: [true, false, false, false, false],
+            createAccount:false,
             coupon:'',
+            config:[],
+            invoice:{
+                customer:{
+                    first_name:'',
+                    last_name:'',
+                    company:'',
+                    country:'',
+                    address1:'',
+                    address2:'',
+                    address3:'',
+                    postcode:'',
+                    phone:'',
+                    email:'',
+                    notes:'',
+                    password:'',
+                    password_confirm:''
+                },
+                couponInUse:[],
+                products:[]
+            }
         };
     },
     computed: {
+        ...mapGetters('customer', ['getCurrentCustomer']),
+        ...mapGetters('store', ['getConfig']),
         ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal'])
     },
+    watch: {
+      '$store.state.customer.customer': function(newVal) {
+        this.handleSetCurCustomer(newVal)
+      },
+      '$store.state.cart.data': function(newVal) {
+        this.invoice.products = newVal;
+      }
+    },
+    created(){
+        if (this.getCurrentCustomer) {
+            this.handleSetCurCustomer(this.getCurrentCustomer)
+        }
+    },
     methods: {
+        handleSetCurCustomer(val){
+            let cur_cus = {...val};
+            this.invoice.customer = Object.assign(this.invoice.customer,cur_cus);
+        },
         updateCart: function() {
             this.updateCart(this.cartItems);
         },
@@ -325,7 +386,67 @@ export default {
                 if (index == index1) return [...acc, !cur];
                 return [...acc, false];
             }, []);
+        },
+        async applyCoupon(){
+            if (this.coupon == '') {
+                return false;
+            }
+            console.log(this.coupon);
+            if (this.invoice.couponInUse.filter((item) => item.code == this.coupon.trim()).length > 0) {
+                this.$vToastify.error( 'This coupon has already been applied' );
+                return false
+            }
+            await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
+                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon}).then((data)=>{
+                    this.invoice.couponInUse.push(data.data);
+                    this.$vToastify.success( data.message );
+                }).catch(({response:{data}})=>{
+                    this.$vToastify.error( data.error );
+                })
+            })
+        },
+        checkOut(){
+            this.$validator.validate().then(valid => {
+                if (valid) {
+                    return false;
+                }
+            });
         }
     }
 };
 </script>
+
+<style type="text/css">
+    .coupon {
+        display: flex;
+        width: 30%;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #a6c76c;
+        border-left: 0;
+    }
+    .coupon .coupon-info{
+        color: #fff;
+        margin-left: 3px;
+        background: #a6c76c;
+        position: relative;
+        padding: 2px 5px 2px 10px;
+        border-right: 1px solid #a6c76c;
+    }
+    .coupon .coupon-info .border-ticket{
+        top: 0;
+        width: 5px;
+        height: 100%;
+        left: -3px;
+        position: absolute;
+        background: radial-gradient(circle at 0 0.25rem,transparent 0,transparent 0.2rem,#a6c76c 0);
+        background-size: 0.3rem 0.6rem;
+        background-repeat: repeat-y;
+    }
+    .coupon .coupon-desc{
+        margin-right: 10px;
+    }
+    .is-danger{
+        border-color: #e02b27 !important;
+    }
+</style>

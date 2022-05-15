@@ -26,7 +26,7 @@ export default {
                 `${baseUrl}/categories/${idParent}`,
             )
             .then(response => {
-                let child = response.data.data;
+                let child = response.data;
                 if (child.length) {
                     this.dataCategories[index].child = child;
                 }else{

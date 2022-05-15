@@ -10,6 +10,7 @@ export const SET_CATEGORIES = 'SET_CATEGORIES';
 export const SET_SLIDER = 'SET_SLIDER';
 export const SET_BRAND = 'SET_BRAND';
 export const SET_BANNER = 'SET_BANNER';
+export const SET_INFO_CHECKOUT = 'SET_INFO_CHECKOUT';
 
 export const state = () => (
     {
@@ -25,6 +26,7 @@ export const state = () => (
         slider:[],
         brand:[],
         banner:[],
+        infoCheckout:[],
     }
 );
 
@@ -61,7 +63,13 @@ export const getters = {
     },
     getBanner: state => {
         return state.banner;
-    }
+    },
+    getInfoCheckout: state => ( key ) => {
+        if (key) {
+            return state.infoCheckout[key];
+        }
+        return state.infoCheckout;
+    },
 }
 
 export const actions = {
@@ -95,13 +103,13 @@ export const actions = {
     getInfoStore:function ({ getters, dispatch }){
         Repository.get(`${baseUrl}/store/getInfo`)
         .then(response => {
-            dispatch('setInfoStore',response.data.data.store)
-            dispatch('setLanguages',response.data.data.languages)
-            dispatch('setCurrencies',response.data.data.currencies)
-            dispatch('setCategories',response.data.data.categories)
-            dispatch('setSlideHome',response.data.data.slider)
-            dispatch('setBrandHome',response.data.data.brands)
-            dispatch('setBannerHome',response.data.data.banner)
+            dispatch('setInfoStore',response.data.store)
+            dispatch('setLanguages',response.data.languages)
+            dispatch('setCurrencies',response.data.currencies)
+            dispatch('setCategories',response.data.categories)
+            dispatch('setSlideHome',response.data.slider)
+            dispatch('setBrandHome',response.data.brands)
+            dispatch('setBannerHome',response.data.banner)
             // set cookie
 
             if (!Cookies.get('f-store')) {
@@ -117,9 +125,11 @@ export const actions = {
             }else{                        
                 dispatch('setCurrency',Cookies.get('f-currency'));
             }
-            
         })
-        .catch(error => ({ error: JSON.stringify(error) }));
+        .catch(error => ({ error: JSON.stringify(error) }));  
+    },
+    setInfoCheckout:function({commit},info) {
+        commit( SET_INFO_CHECKOUT, info );
     }
 }
 
@@ -156,4 +166,7 @@ export const mutations = {
     [ SET_BANNER ] ( state,banner ) {
         state.banner = banner;
     },
+    [ SET_INFO_CHECKOUT ] (state,info) {
+        state.infoCheckout = info;
+    }
 }

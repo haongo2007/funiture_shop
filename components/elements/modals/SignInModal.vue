@@ -123,15 +123,17 @@ export default {
                 return false;
             }
             await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
-                Repository.post(`${baseUrl}/auth/login`,this.temp).then(({data})=>{
+                Repository.post(`${baseUrl}/auth/login`,this.temp).then((data)=>{
                     
                     if (data.access_token) {
                         this.$store.dispatch('customer/setToken',data.access_token);
                         this.$store.dispatch('customer/getCustomer');
                         
                         this.$vToastify.success( "successful login" );
+                        this.$emit('close')
+                    }else{
+                        this.$vToastify.error( data.message );
                     }
-                    this.$emit('close')
                     this.loginState = false;
                 }).catch((error)=>{
                     console.log(error);

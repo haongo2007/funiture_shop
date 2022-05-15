@@ -24,6 +24,7 @@
                                 <thead>
                                     <tr>
                                         <th>Product</th>
+                                        <th>Attribute</th>
                                         <th>Price</th>
                                         <th>Quantity</th>
                                         <th>Total</th>
@@ -55,7 +56,16 @@
                                                 </h3>
                                             </div>
                                         </td>
-                                        <td class="price-col" v-if="product.price.length">${{ product.price.toFixed(2) }}</td>
+                                        <td class="price-col">
+                                            <span class="cart-product-info d-flex flex-wrap" >
+                                                <span class="cart-product-qty d-flex" style="margin-bottom: 2px;" v-for="(item,index) in product.variants" :key="index">
+                                                    <span class="tip tip-new" style="font-size:1rem;margin-left:0;position: unset;padding:3px" :style="{'background': item.code}">
+                                                        {{ item.color }} ({{ item.size }}) {{ priceConvert(parseInt(item.price_color)+parseInt(item.price_size)) }} 
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </td>
+                                        <td class="price-col" v-if="product.price.length">{{ priceConvert(product.price) }}</td>
                                         <td class="quantity-col">
                                             <quantity-input
                                                 :product="product"
@@ -63,7 +73,7 @@
                                                 class="cart-product-quantity"
                                             ></quantity-input>
                                         </td>
-                                        <td class="total-col" v-if="product.sum">${{ product.sum.toFixed(2) }}</td>
+                                        <td class="total-col" v-if="product.sum">{{ priceConvert(product.sum) }}</td>
                                         <td class="remove-col">
                                             <button
                                                 @click.prevent="removeFromCart({product: product})"
@@ -129,7 +139,7 @@
                                     <tbody>
                                         <tr class="summary-subtotal">
                                             <td>Subtotal:</td>
-                                            <td v-if="priceTotal">${{ priceTotal.toFixed(2) }}</td>
+                                            <td v-if="priceTotal">{{ priceConvert(priceTotal) }}</td>
                                         </tr>
 
                                         <tr class="summary-shipping">
@@ -137,47 +147,8 @@
                                             <td>&nbsp;</td>
                                         </tr>
 
-                                        <tr class="summary-shipping-row">
-                                            <td>
-                                                <div class="custom-control custom-radio">
-                                                    <input
-                                                        type="radio"
-                                                        id="free-shipping"
-                                                        name="shipping"
-                                                        v-model="shipping"
-                                                        :value="0"
-                                                        class="custom-control-input"
-                                                    />
-                                                    <label
-                                                        class="custom-control-label"
-                                                        for="free-shipping"
-                                                    >Free Shipping</label>
-                                                </div>
-                                            </td>
-                                            <td>$0.00</td>
-                                        </tr>
 
-                                        <tr class="summary-shipping-row">
-                                            <td>
-                                                <div class="custom-control custom-radio">
-                                                    <input
-                                                        type="radio"
-                                                        id="standart-shipping"
-                                                        name="shipping"
-                                                        class="custom-control-input"
-                                                        v-model="shipping"
-                                                        :value="10"
-                                                    />
-                                                    <label
-                                                        class="custom-control-label"
-                                                        for="standart-shipping"
-                                                    >Standard:</label>
-                                                </div>
-                                            </td>
-                                            <td>$10.00</td>
-                                        </tr>
-
-                                        <tr class="summary-shipping-row">
+                                        <tr class="summary-shipping-row" v-for="(item,index) in getInfoCheckout('shippingMethod')" :key="index">
                                             <td>
                                                 <div class="custom-control custom-radio">
                                                     <input
@@ -186,15 +157,15 @@
                                                         name="shipping"
                                                         class="custom-control-input"
                                                         v-model="shipping"
-                                                        :value="20"
+                                                        :value="item.fee"
                                                     />
                                                     <label
                                                         class="custom-control-label"
                                                         for="express-shipping"
-                                                    >Express:</label>
+                                                    >{{ index }}:</label>
                                                 </div>
                                             </td>
-                                            <td>$20.00</td>
+                                            <td>{{ priceConvert(item.fee) }}</td>
                                         </tr>
 
                                         <tr class="summary-shipping-estimate">
@@ -208,7 +179,7 @@
 
                                         <tr class="summary-total">
                                             <td>Total:</td>
-                                            <td>${{ (priceTotal + shipping).toFixed(2) }}</td>
+                                            <td>{{ (priceTotal + shipping).toFixed(2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -236,7 +207,7 @@
                                 <p class="px-3 py-2 cart-empty mb-3">No products added to the cart</p>
                                 <p class="return-to-shop mb-0">
                                     <nuxt-link
-                                        to="/shop/sidebar/list"
+                                        to="/shop"
                                         class="btn btn-primary"
                                     >RETURN TO SHOP</nuxt-link>
                                 </p>
@@ -253,6 +224,7 @@ import { mapGetters, mapActions, mapMutations } from 'vuex';
 import PageHeader from '~/components/elements/PageHeader';
 import QuantityInput from '~/components/elements/QuantityInput';
 import Repository,{ baseDomain,baseUrl } from '~/repositories/repository';
+import { priceConvert } from '~/utilities/common';
 
 export default {
     components: {
@@ -270,19 +242,33 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal'])
+        ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal']),
+        ...mapGetters('store', ['getInfoCheckout']),
     },
     watch: {
         cartList: function() {
             this.cartItems = [...this.cartList];
+        },
+        'getInfoCheckout': function(newVal) {
+            let ship = this.getInfoCheckout('shippingMethod');
+            this.shipping = ship[Object.keys(ship)[0]].fee;
         }
     },
     created: function() {
         this.cartItems = [...this.cartList];
+        this.getCheckoutMethod();
     },
     methods: {
+        priceConvert,
         ...mapActions('cart', ['removeFromCart']),
         ...mapActions('cart', ['updateCart']),
+        getCheckoutMethod(){
+            if (Object.keys(this.getInfoCheckout).length == 0) {
+                Repository.get(`${baseUrl}/checkout/info`).then((response) => {
+                    this.$store.dispatch('store/setInfoCheckout',response.data);
+                })
+            }
+        },
         changeQty: function(value, product) {
             this.cartItems = this.cartItems.reduce((acc, cur) => {
                 if (cur.name == product.name)
@@ -306,15 +292,19 @@ export default {
             }else{
                 return false;
             }
+            if (this.couponInUse.filter((item) => item.code == this.coupon.trim()).length > 0) {
+                this.$vToastify.error( 'This coupon has already been applied' );
+                this.checkedCoupon = false;
+                return false
+            }
             await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
-                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon}).then(({data})=>{
-                    if (data) {
-                        this.checkedCoupon = false;
-                        this.couponInUse.push(data.data);
-                        this.$vToastify.success( data.msg );
-                    }
+                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon}).then((data)=>{
+                    this.checkedCoupon = false;
+                    this.couponInUse.push(data.data);
+                    this.$vToastify.success( data.message );
                 }).catch(({response:{data}})=>{
-                    console.log(data);
+                    this.checkedCoupon = false;
+                    this.$vToastify.error( data.error );
                 })
             })
         }
