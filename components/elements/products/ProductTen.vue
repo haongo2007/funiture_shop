@@ -84,16 +84,17 @@
             </div>
 
             <template v-else>
-                <div class="product-price" v-if="minPrice == maxPrice">{{ priceConvert(minPrice) }}</div>
+                <div class="product-price" v-if="product.sale_price.hasOwnProperty('price_promotion')">
+                    <span class="new-price">{{ priceConvert(product.sale_price.price_promotion) }}</span>
+                    <span class="old-price">{{ priceConvert(product.price) }}</span>
+                </div>
                 <template v-else>
-                    <div class="product-price" v-if="Object.keys(product.variants).length == 0">
-                        <span class="new-price">{{ priceConvert(minPrice) }}</span>
-                        <span class="old-price">{{ priceConvert(maxPrice) }}</span>
+                    <div class="product-price" v-if="maxPrice != minPrice">
+                        <div class="product-price" >{{ priceConvert(minPrice)}} - {{ priceConvert(maxPrice)}}</div>
                     </div>
-                    <div
-                        class="product-price"
-                        v-else
-                    >{{ priceConvert(minPrice) }} - {{ priceConvert(maxPrice) }}</div>
+                    <div class="product-price" v-else>
+                        <span class="new-price">{{ priceConvert(product.price) }}</span>
+                    </div>
                 </template>
             </template>
 

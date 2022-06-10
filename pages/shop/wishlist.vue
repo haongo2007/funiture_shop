@@ -183,7 +183,7 @@
 	</main>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters,mapActions } from 'vuex';
 import PageHeader from '~/components/elements/PageHeader';
 import { baseDomain } from '~/repositories/repository.js';
 
@@ -241,6 +241,7 @@ export default {
 		}
 	},
 	methods: {
+        ...mapActions('wishlist', ['removeFromWishlist']),
 		openConfirmVariant(product) {
 			this.$modal.show(
                 () => import('~/components/elements/modals/AddVariantsModal'),

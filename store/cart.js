@@ -10,13 +10,37 @@ export const state = () => (
     }
 );
 
+
 export const getters = {
     cartList: state => {
         return state.data
     },
-    priceTotal: state => {
+    priceTotal: (state,getters) => {
         return state.data.reduce( ( acc, cur ) => {
-            return acc + cur.sum
+            return acc + cur.sum  + cur.sumVariantPrice + getters.priceTaxByProduct(cur)
+        }, 0 );
+    },
+    priceTotalWithTax: state => {
+        return state.data.reduce( ( acc, cur ) => {
+            return acc + cur.sum + cur.tax
+        }, 0 );
+    },
+    priceTotalWithVariant: (state,getters) => {
+        return state.data.reduce( ( acc, cur ) => {
+            return acc + cur.sum + cur.sumVariantPrice
+        }, 0 );
+    },
+    priceTax: state => {
+        return state.data.reduce( ( acc, cur ) => {
+            return acc + ((cur.sum + cur.sumVariantPrice) * cur.tax / 100) 
+        }, 0 );
+    },
+    priceTaxByProduct: state => (product) => {
+        return ((product.sum + product.sumVariantPrice) * product.tax / 100) 
+    },
+    priceVariant: state => (product) => {
+        return state.data.reduce( ( acc, cur ) => {
+            return acc + cur.sumVariantPrice * cur.qty;
         }, 0 );
     },
     qtyTotal: state => {
@@ -69,29 +93,35 @@ export const mutations = {
     [ ADD_TO_CART ] ( state, payload ) {
         var findIndex = state.data.findIndex( item => item.id == payload.product.id );
         let qty = payload.qty ? payload.qty : 1;
-        let variants = payload.product.selectedVariant;
-        variants.qty = qty;
+        let variants = {
+            attributes: payload.product.selectedVariant,
+            qty: qty,
+        };
+        let sumVariantPrice = 0;
         if ( findIndex !== -1 && payload.product.variants.length > 0 ) {
             findIndex = state.data.findIndex( item => item.name == payload.product.name );
         }
 
         if ( findIndex !== -1 ) {
-            let sumVariant = 0;
             state.data = state.data.reduce( ( acc, product, index ) => {
                 if ( findIndex == index ) {
-                    let findIndexVariant = product.variants.findIndex((item) => item.color == variants.color && item.size == variants.size);
-                    if (findIndexVariant !== -1) {// has
-                        product.variants[findIndexVariant].qty += variants.qty;
-                    } else {
-                        product.variants.push(variants);
+                    let findVar = product.selectedVariant.findIndex((item) => { return JSON.stringify(item.attributes) === JSON.stringify(variants.attributes); });
+                    if ( findVar !== -1 ){
+                        product.selectedVariant[findVar].qty += variants.qty;
+                    }else{
+                        product.selectedVariant.push(variants);
                     }
-                    product.variants.forEach( function(element, index) {
-                        sumVariant += (element.price_size + element.price_color) * element.qty;
-                    });
+
+                    for(let index in variants.attributes) {
+                        let item = variants.attributes[index];
+                        sumVariantPrice += product.variants[index][item.value_index].price * variants.qty;
+                    };
+                    
+                    product.sumVariantPrice += sumVariantPrice;
                     acc.push( {
                         ...product,
                         qty: product.qty + qty,
-                        sum: payload.product.price * ( product.qty + qty ) + sumVariant
+                        sum: payload.product.price * ( product.qty + qty )
                     } );
                 } else {
                     acc.push( product );
@@ -99,21 +129,21 @@ export const mutations = {
                 return acc;
             }, [] );
         } else {
+            for(let index in variants.attributes) {
+                let item = variants.attributes[index];
+                sumVariantPrice += payload.product.variants[index][item.value_index].price * variants.qty;
+            };
+
             variants = [variants];
-            let sumVariant = 0;
-
-            variants.forEach( function(element, index) {
-                sumVariant += (element.price_size + element.price_color) * element.qty;
-            });
-
             state.data = [
                 ...state.data,
                 {
                     ...payload.product,
                     qty: qty,
-                    variants,
+                    sumVariantPrice: sumVariantPrice,
+                    selectedVariant:variants,
                     price: payload.product.price,
-                    sum: qty * payload.product.price + sumVariant
+                    sum: qty * payload.product.price
                 }
             ];
         }

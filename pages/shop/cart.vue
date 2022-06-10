@@ -26,6 +26,7 @@
                                         <th>Product</th>
                                         <th>Attribute</th>
                                         <th>Price</th>
+                                        <th>Tax</th>
                                         <th>Quantity</th>
                                         <th>Total</th>
                                         <th></th>
@@ -51,21 +52,19 @@
 
                                                 <h3 class="product-title">
                                                     <nuxt-link
+                                                        class="txt-ellipsis"
                                                         :to="'/product/default/' + product.slug"
                                                     >{{ product.name }}</nuxt-link>
                                                 </h3>
                                             </div>
                                         </td>
                                         <td class="price-col">
-                                            <span class="cart-product-info d-flex flex-wrap" >
-                                                <span class="cart-product-qty d-flex" style="margin-bottom: 2px;" v-for="(item,index) in product.variants" :key="index">
-                                                    <span class="tip tip-new" style="font-size:1rem;margin-left:0;position: unset;padding:3px" :style="{'background': item.code}">
-                                                        {{ item.color }} ({{ item.size }}) {{ priceConvert(parseInt(item.price_color)+parseInt(item.price_size)) }} 
-                                                    </span>
-                                                </span>
-                                            </span>
+                                            {{ priceConvert(product.sumVariantPrice) }}
                                         </td>
-                                        <td class="price-col" v-if="product.price.length">{{ priceConvert(product.price) }}</td>
+                                        <td class="total-col">{{ priceConvert(product.price) }}</td>
+                                        <td class="price-col">
+                                            {{ product.tax }}%
+                                        </td>
                                         <td class="quantity-col">
                                             <quantity-input
                                                 :product="product"
@@ -73,7 +72,9 @@
                                                 class="cart-product-quantity"
                                             ></quantity-input>
                                         </td>
-                                        <td class="total-col" v-if="product.sum">{{ priceConvert(product.sum) }}</td>
+                                        <td>
+                                            {{ priceConvert(product.sum + product.sumVariantPrice + priceTaxByProduct(product)) }}
+                                        </td>
                                         <td class="remove-col">
                                             <button
                                                 @click.prevent="removeFromCart({product: product})"
@@ -86,7 +87,7 @@
                                 </tbody>
                             </table>
                             <div class="cart-top">
-                                <div class="coupon mb-1" v-for="item in couponInUse" :key="item.id">
+                                <div class="coupon mb-1" v-for="item in getCoupon" :key="item.id">
                                     <div class="coupon-info">
                                         <div>{{ item.code }}</div>
                                         <div class="border-ticket"></div>
@@ -138,34 +139,47 @@
                                 <table class="table table-summary">
                                     <tbody>
                                         <tr class="summary-subtotal">
-                                            <td>Subtotal:</td>
-                                            <td v-if="priceTotal">{{ priceConvert(priceTotal) }}</td>
+                                            <td>Total:</td>
+                                            <td v-if="subTotal">{{ priceConvert(subTotal) }}</td>
                                         </tr>
+                                    </tbody>
+                                </table>
 
-                                        <tr class="summary-shipping">
-                                            <td>Shipping:</td>
-                                            <td>&nbsp;</td>
+                                <table class="table table-summary mt-2" v-if="getCoupon.length > 0">
+                                    <thead>
+                                        <tr>
+                                            <th>Discount</th>
+                                            <th>Reward</th>
                                         </tr>
+                                    </thead>
 
-
-                                        <tr class="summary-shipping-row" v-for="(item,index) in getInfoCheckout('shippingMethod')" :key="index">
+                                    <tbody>
+                                        
+                                        <tr v-for="item in getCoupon" :key="item.id">
                                             <td>
-                                                <div class="custom-control custom-radio">
-                                                    <input
-                                                        type="radio"
-                                                        id="express-shipping"
-                                                        name="shipping"
-                                                        class="custom-control-input"
-                                                        v-model="shipping"
-                                                        :value="item.fee"
-                                                    />
-                                                    <label
-                                                        class="custom-control-label"
-                                                        for="express-shipping"
-                                                    >{{ index }}:</label>
+                                                <div class="coupon-checkout">
+                                                    <div class="coupon-info">
+                                                        <div>{{ item.code }}</div>
+                                                        <div class="border-ticket"></div>
+                                                    </div>
+                                                    <div class="coupon-desc txt-ellipsis">
+                                                        {{ item.data }}
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td>{{ priceConvert(item.fee) }}</td>
+                                            <td>{{ priceConvert(item.value) }}</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-summary  mb-2">
+
+                                    <tbody>
+                                        
+                                        <tr class="summary-subtotal">
+                                            <td>Subtotal:</td>
+                                            <td>{{ priceConvert(subTotal + shipping) }}</td>
                                         </tr>
 
                                         <tr class="summary-shipping-estimate">
@@ -175,11 +189,6 @@
                                                 <nuxt-link to="/shop/dashboard">Change address</nuxt-link>
                                             </td>
                                             <td>&nbsp;</td>
-                                        </tr>
-
-                                        <tr class="summary-total">
-                                            <td>Total:</td>
-                                            <td>{{ (priceTotal + shipping).toFixed(2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -238,37 +247,43 @@ export default {
             baseDomain: baseDomain,
             shipping: 0,
             coupon:'',
-            couponInUse:[],
+            subTotal:0,
         };
     },
     computed: {
-        ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal']),
-        ...mapGetters('store', ['getInfoCheckout']),
+        ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal', 'priceTaxByProduct']),
+        ...mapGetters('store',['getShippingMethod']),
+        ...mapGetters('coupon',['getCoupon']),
     },
     watch: {
         cartList: function() {
             this.cartItems = [...this.cartList];
         },
-        'getInfoCheckout': function(newVal) {
-            let ship = this.getInfoCheckout('shippingMethod');
-            this.shipping = ship[Object.keys(ship)[0]].fee;
-        }
+        getCoupon: function() {
+            this.subTotal = this.priceTotal;
+            if (this.getCoupon.length) {
+                let sum = this.getCoupon.reduce( ( acc, cur ) => {
+                    return acc + cur.value;
+                }, 0 );
+                this.subTotal = sum + this.priceTotal;
+            }
+        },
     },
     created: function() {
         this.cartItems = [...this.cartList];
-        this.getCheckoutMethod();
+        this.subTotal = this.priceTotal;
+        if (this.getCoupon.length) {
+            let sum = this.getCoupon.reduce( ( acc, cur ) => {
+                return acc + cur.value;
+            }, 0 );
+            this.subTotal = sum + this.priceTotal;
+        }
     },
     methods: {
         priceConvert,
         ...mapActions('cart', ['removeFromCart']),
         ...mapActions('cart', ['updateCart']),
-        getCheckoutMethod(){
-            if (Object.keys(this.getInfoCheckout).length == 0) {
-                Repository.get(`${baseUrl}/checkout/info`).then((response) => {
-                    this.$store.dispatch('store/setInfoCheckout',response.data);
-                })
-            }
-        },
+        ...mapActions('coupon', ['addCoupon']),
         changeQty: function(value, product) {
             this.cartItems = this.cartItems.reduce((acc, cur) => {
                 if (cur.name == product.name)
@@ -277,10 +292,7 @@ export default {
                         {
                             ...cur,
                             qty: value,
-                            sum:
-                                (product.sale_price
-                                    ? product.sale_price
-                                    : product.price) * value
+                            sum: (product.sale_price ? product.sale_price.price_promotion : product.price) * value
                         }
                     ];
                 return [...acc, cur];
@@ -292,15 +304,16 @@ export default {
             }else{
                 return false;
             }
-            if (this.couponInUse.filter((item) => item.code == this.coupon.trim()).length > 0) {
+            if (this.getCoupon.length && this.getCoupon.filter((item) => { item.code.toLowerCase().trim() == this.coupon.toLowerCase().trim()})) {
                 this.$vToastify.error( 'This coupon has already been applied' );
                 this.checkedCoupon = false;
                 return false
             }
             await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
-                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon}).then((data)=>{
+                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon,total:this.priceTotal}).then((data)=>{
                     this.checkedCoupon = false;
-                    this.couponInUse.push(data.data);
+                    this.addCoupon(data.data)
+                    this.subTotal = this.subTotal + data.data.value;
                     this.$vToastify.success( data.message );
                 }).catch(({response:{data}})=>{
                     this.checkedCoupon = false;

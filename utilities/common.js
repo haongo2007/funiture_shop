@@ -184,5 +184,6 @@ export const mobileMenu = function () {
 export const priceConvert = function(price) {
     let currency = window.$nuxt.$store.state.store.currency;
     price = price * currency.exchange_rate;
+    price = price.toFixed(2);
     return currency.symbol+price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, currency.thousands);
 }

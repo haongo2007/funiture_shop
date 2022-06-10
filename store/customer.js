@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 
 export const SET_TOKEN = 'SET_TOKEN';
 export const SET_CUSTOMER = 'SET_CUSTOMER';
+export const LOGOUT = 'LOGOUT';
 
 export const state = () => (
     {
@@ -29,17 +30,14 @@ export const actions = {
     getCustomer({ commit, state }) {
         Repository.get(`${baseUrl}/customer`)
         .then(response => {
-          const { data } = response;
-          
-          commit('SET_CUSTOMER', data);
+            let {data} = response;
+            commit('SET_CUSTOMER', data);
         }).catch(error => {
-          console.log(error);
+            commit('LOGOUT');
         });
     },
     logout({ commit, state }) {
-        commit('SET_CUSTOMER', {});
-        commit('SET_TOKEN', '');
-        Cookies.remove('f-token');
+        commit('LOGOUT');
     }
 }
 
@@ -49,5 +47,10 @@ export const mutations = {
     },
     [ SET_CUSTOMER ] ( state,customer ) {
         state.customer = customer;
+    },
+    [ LOGOUT ] ( state ) {
+        state.token = '';
+        state.customer = {};
+        Cookies.remove('f-token');
     },
 }

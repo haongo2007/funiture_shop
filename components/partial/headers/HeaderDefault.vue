@@ -99,6 +99,7 @@
 						</nuxt-link>
 					</div>
 
+					<compare-menu></compare-menu>
 					<wishlist-menu></wishlist-menu>
 
 					<cart-menu></cart-menu>
@@ -145,6 +146,7 @@
 <script>
 import CartMenu from '~/components/partial/headers/shared/CartMenu';
 import WishlistMenu from '~/components/partial/headers/shared/WishlistMenu';
+import CompareMenu from '~/components/partial/headers/shared/CompareMenu';
 import MainMenu from '~/components/partial/headers/shared/MainMenu';
 import HeaderSearch from '~/components/partial/headers/shared/HeaderSearch';
 import StickyHeader from '~/components/elements/StickyHeader';
@@ -155,6 +157,7 @@ export default {
 	components: {
 		CartMenu,
 		WishlistMenu,
+		CompareMenu,
 		MainMenu,
 		HeaderSearch,
 		StickyHeader,

@@ -17,12 +17,10 @@
                         </h4>
 
                         <span class="cart-product-info d-flex flex-wrap" >
-                            <span class="cart-product-qty d-flex" style="margin-bottom: 2px;" v-for="(item,index) in product.variants" :key="index">
-                                <span class="tip tip-new" style="margin-left:0;position: unset;padding:3px" :style="{'background': item.code}">
-                                    {{ item.color }} ({{ item.size }}) {{ priceConvert(parseInt(item.price_color)+parseInt(item.price_size)) }} 
-                                </span>
-                                <span class="tip tip-new" style="margin-left:0;position: unset;padding:3px">
-                                    {{ priceConvert(parseInt(item.price_color)+parseInt(item.price_size) + product.price) }} x {{ item.qty }}
+                            <span class="cart-product-qty d-flex" style="margin-bottom: 2px;" v-for="(item,index) in product.selectedVariant" :key="index">
+
+                                <span v-for="(item1,index1) in item.attributes" :key="index1" class="tip tip-new" style="margin-left:0;position: unset;padding:3px" :style="{'background': product.variants[index1][item1.value_index].color}">
+                                    {{ product.variants[index1][item1.value_index].name }} {{ '('+ priceConvert(product.variants[index1][item1.value_index].price) +')' }} 
                                 </span>
                             </span>
                         </span>
@@ -45,7 +43,7 @@
             <div class="dropdown-cart-total">
                 <span>Total</span>
 
-                <span class="cart-total-price">{{ priceConvert(priceTotal) }}</span>
+                <span class="cart-total-price">{{ priceConvert(priceTotalWithVariant) }}</span>
             </div>
 
             <div class="dropdown-cart-action">
@@ -73,7 +71,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal'])
+        ...mapGetters('cart', ['cartList', 'priceTotalWithVariant', 'qtyTotal'])
     },
     methods: {
         priceConvert,

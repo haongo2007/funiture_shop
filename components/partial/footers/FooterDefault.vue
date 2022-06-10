@@ -6,7 +6,7 @@
 					<div class="col-sm-6 col-lg-3">
 						<div class="widget widget-about">
 							<img
-								v-lazy="'./images/logo.png'"
+								v-lazy="logo"
 								class="footer-logo bg-transparent"
 								alt="Footer Logo"
 								width="105"
@@ -160,6 +160,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
     data: function () {
         return {
@@ -167,6 +168,7 @@ export default {
         }
     },
     computed: {
+        ...mapGetters('store', ['logo']),
         isFullwidth: function() {
             return this.$route.path.includes('fullwidth');
         }

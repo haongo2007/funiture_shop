@@ -142,9 +142,6 @@ export default {
             });
         }
     },
-    created(){
-
-    },
     methods: {
         toOrder: function() {
             document

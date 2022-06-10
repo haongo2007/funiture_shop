@@ -464,7 +464,7 @@
                     </div>
                 </div> -->
             </li>
-            <li :class="{active: current=='product'}">
+            <!-- <li :class="{active: current=='product'}">
                 <nuxt-link
                     to="/product/default/dark-yellow-lace-cut-out-swing-dress"
                     class="sf-with-ul"
@@ -550,8 +550,8 @@
                         </div>
                     </div>
                 </div>
-            </li>
-            <li :class="{active: current=='pages'}">
+            </li> -->
+            <!-- <li :class="{active: current=='pages'}">
                 <a href="javascript:;" class="sf-with-ul">Pages</a>
 
                 <ul>
@@ -592,10 +592,10 @@
                         <nuxt-link to="/pages/coming-soon">Coming Soon</nuxt-link>
                     </li>
                 </ul>
-            </li>
+            </li> -->
             <li :class="{active: current=='blog'}">
-                <nuxt-link to="/blog/classic" class="sf-with-ul">Blog</nuxt-link>
-                <ul>
+                <nuxt-link to="/blog/classic">Blog</nuxt-link>
+                <!-- <ul>
                     <li>
                         <nuxt-link to="/blog/classic">Classic</nuxt-link>
                     </li>
@@ -670,9 +670,9 @@
                             </li>
                         </ul>
                     </li>
-                </ul>
+                </ul> -->
             </li>
-            <li :class="{active: current=='elements'}">
+            <!-- <li :class="{active: current=='elements'}">
                 <nuxt-link to="/elements" class="sf-with-ul">Elements</nuxt-link>
 
                 <ul>
@@ -719,7 +719,7 @@
                         <nuxt-link to="/elements/icon-boxes">Icon Boxes</nuxt-link>
                     </li>
                 </ul>
-            </li>
+            </li> -->
         </ul>
     </nav>
 </template>

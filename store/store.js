@@ -26,7 +26,6 @@ export const state = () => (
         slider:[],
         brand:[],
         banner:[],
-        infoCheckout:[],
     }
 );
 
@@ -64,12 +63,12 @@ export const getters = {
     getBanner: state => {
         return state.banner;
     },
-    getInfoCheckout: state => ( key ) => {
-        if (key) {
-            return state.infoCheckout[key];
-        }
-        return state.infoCheckout;
+    getShippingMethod: state => {
+        return state.info.shipping_method;
     },
+    getPaymentMethod: state => {
+        return state.info.payment_method;
+    }
 }
 
 export const actions = {
@@ -100,33 +99,18 @@ export const actions = {
     setBannerHome:function ({commit},banner){
         commit( SET_BANNER, banner );
     },
-    getInfoStore:function ({ getters, dispatch }){
-        Repository.get(`${baseUrl}/store/getInfo`)
+    async getInfoStore({ commit }){
+        await Repository.get(`${baseUrl}/store/getInfo`)
         .then(response => {
-            dispatch('setInfoStore',response.data.store)
-            dispatch('setLanguages',response.data.languages)
-            dispatch('setCurrencies',response.data.currencies)
-            dispatch('setCategories',response.data.categories)
-            dispatch('setSlideHome',response.data.slider)
-            dispatch('setBrandHome',response.data.brands)
-            dispatch('setBannerHome',response.data.banner)
-            // set cookie
-
-            if (!Cookies.get('f-store')) {
-                Cookies.set('f-store', getters.info.id);
-            }
-            if (!Cookies.get('f-language')) {
-                Cookies.set('f-language', getters.getLang.code);  
-            }else{                        
-                this.$store.dispatch('store/setLang',Cookies.get('f-language'));
-            }
-            if (!Cookies.get('f-currency')) {
-                Cookies.set('f-currency', getters.getCurrency.code);
-            }else{                        
-                dispatch('setCurrency',Cookies.get('f-currency'));
-            }
+            commit(SET_INFO,response.data.store)
+            commit(SET_LANGUAGES,response.data.languages)
+            commit(SET_CURRENCIES,response.data.currencies)
+            commit(SET_CATEGORIES,response.data.categories)
+            commit(SET_SLIDER,response.data.slider)
+            commit(SET_BRAND,response.data.brands)
+            commit(SET_BANNER,response.data.banner)
         })
-        .catch(error => ({ error: JSON.stringify(error) }));  
+        .catch(error => ({ error: JSON.stringify(error) })); 
     },
     setInfoCheckout:function({commit},info) {
         commit( SET_INFO_CHECKOUT, info );
@@ -135,24 +119,34 @@ export const actions = {
 
 export const mutations = {
     [ SET_INFO ] ( state,info ) {
+        if (!Cookies.get('f-store')) {
+            Cookies.set('f-store', info.id);
+        }
         state.info = info;
     },
-    [ SET_LANGUAGES ] ( state,lang ) {
-        state.languages = lang;
-        state.lang.name = lang[0].name;
-        state.lang.code = lang[0].code;
+    [ SET_LANGUAGES ] ( state,languages ) {
+        state.languages = languages;
+        if (!Cookies.get('f-language')) {
+            let lang = languages[Object.keys(languages)[0]];
+            state.lang.code = lang.code;
+            state.lang.name = lang.name;
+            Cookies.set('f-language', lang.code);  
+        }
     },
     [ SET_CURRENCIES ] ( state,currencies ) {
         state.currencies = currencies;
-        state.currency.name = currencies[0].name;
-        state.currency.code = currencies[0].code;
+        if (!Cookies.get('f-currency')) {
+            let currency = currencies[Object.keys(currencies)[0]];
+            state.currency = currency;
+            Cookies.set('f-currency', currency.code);  
+        }
     },
     [ SET_CURRENCY ] ( state,currency ) {
-        state.currency = state.currencies.filter((item) => item.code == currency)[0];
+        state.currency = state.currencies[currency];
     },
     [ SET_LANG ] ( state,lang ) {
-        state.lang.name = state.languages.filter((item) => item.code == lang)[0].name;
-        state.lang.code = lang;
+        state.lang.name = state.languages[lang].name;
+        state.lang.code = state.languages[lang].code;
     },
     [ SET_CATEGORIES ] ( state,categories ) {
         state.categories = categories;
@@ -166,7 +160,4 @@ export const mutations = {
     [ SET_BANNER ] ( state,banner ) {
         state.banner = banner;
     },
-    [ SET_INFO_CHECKOUT ] (state,info) {
-        state.infoCheckout = info;
-    }
 }

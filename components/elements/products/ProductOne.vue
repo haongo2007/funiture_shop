@@ -82,18 +82,19 @@
             <div class="product-price" v-if="product.stock==0" key="outPrice">
                 <span class="out-price">${{ product.price.toFixed(2) }}</span>
             </div>
-
+            
             <template v-else>
-                <div class="product-price" v-if="minPrice == maxPrice">${{ minPrice.toFixed(2) }}</div>
+                <div class="product-price" v-if="product.sale_price.hasOwnProperty('price_promotion')">
+                    <span class="new-price">{{ priceConvert(product.sale_price.price_promotion) }}</span>
+                    <span class="old-price">{{ priceConvert(product.price) }}</span>
+                </div>
                 <template v-else>
-                    <div class="product-price" v-if="product.variants.length == 0">
-                        <span class="new-price">${{ minPrice.toFixed(2) }}</span>
-                        <span class="old-price">${{ maxPrice.toFixed(2) }}</span>
+                    <div class="product-price" v-if="maxPrice != minPrice">
+                        <div class="product-price" >{{ priceConvert(minPrice)}} - {{ priceConvert(maxPrice)}}</div>
                     </div>
-                    <div
-                        class="product-price"
-                        v-else
-                    >${{minPrice.toFixed(2)}}&ndash;${{maxPrice.toFixed(2)}}</div>
+                    <div class="product-price" v-else>
+                        <span class="new-price">{{ priceConvert(product.price) }}</span>
+                    </div>
                 </template>
             </template>
 

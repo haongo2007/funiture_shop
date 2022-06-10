@@ -25,7 +25,7 @@
                     </div>
                 </div>
 
-                <info-one></info-one>
+                <info-one :descriptions="descriptions"></info-one>
 
                 <related-products-one :products="relatedProducts"></related-products-one>
             </div>
@@ -74,6 +74,7 @@ export default {
             prevProduct: null,
             nextProduct: null,
             relatedProducts: [],
+            descriptions: {},
             loaded: false,
             ProductDetail:'',
             ProductGallery:'',
@@ -100,6 +101,7 @@ export default {
                     this.relatedProducts = [...response.data.relatedProducts];
                     this.prevProduct = response.data.prevProduct;
                     this.nextProduct = response.data.nextProduct;
+                    this.descriptions = response.data.product.short_desc;
                     this.ProductDetail = 'DetailOne';
                     this.ProductGallery = 'GalleryVertical';
                     this.loaded = true;

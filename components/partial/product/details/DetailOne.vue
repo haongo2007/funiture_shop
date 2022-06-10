@@ -29,6 +29,16 @@
             </template>
         </template>
 
+        <div class="product-cat w-100 text-truncate">
+            <span>Category:</span>
+            <span v-for="(cat, index) of product.category" :key="index">
+                <nuxt-link
+                    :to="{path: '/shop?category=', query: {category: cat.alias}}"
+                >{{ cat.descriptions_with_lang_default.title }}</nuxt-link>
+                {{ index < product.category.length - 1 ? ',' : '' }}
+            </span>
+        </div>
+
         <div class="product-content">
             <p>{{ product.short_desc.description }}</p>
         </div>
@@ -40,11 +50,11 @@
                 <div class="product-nav product-nav-dots">
                     <a :title="item.name"
                         href="#"
-                        :class="{active: item.color == selectedVariant.code, disabled: item.disabled}"
-                        :style="{'background-color': item.color}"
                         v-for="(item, index) in product.variants.color"
+                        :class="{active: selectedVariant.hasOwnProperty(item.type) && index == selectedVariant[item.type].value_index, disabled: item.disabled}"
+                        :style="{'background-color': item.color}"
                         :key="index"
-                        @click.prevent="selectColor(item)"
+                        @click.prevent="selectAtttribute(item)"
                     ></a>
                 </div>
             </div>
@@ -56,14 +66,14 @@
                         name="size"
                         id="size"
                         class="form-control"
-                        @change="selectSize()"
+                        @change="selectAtttribute()"
                         v-model="selectedSize"
                     >
-                        <option value="null" :selected="selectedVariant.size == null">Select a size</option>
+                        <option value="null" :selected="!selectedVariant.size">Select a size</option>
                         <option
-                            :selected="selectedVariant.size == item.name"
-                            :value="item"
                             v-for="(item, index) in product.variants.size"
+                            :selected="selectedVariant.hasOwnProperty(item.type) && index == selectedVariant[item.type].value_index"
+                            :value="item"
                             :key="index"
                         >{{ item.name }}</option>
                     </select>
@@ -74,9 +84,9 @@
                 </a>
                 <a href="#" @click.prevent="clearSelection" v-if="showClear">clear</a>
             </div>
-            <vue-slide-toggle :open="showVariationPrice">
+            <vue-slide-toggle :open="showClear">
                 <div class="product-price" >
-                    {{ priceConvert(parseInt(selectedVariant.price_size) + parseInt(selectedVariant.price_color)) }}
+                    {{ priceConvert(sumAttrbutePrice) }}
                 </div>
             </vue-slide-toggle>
         </template>
@@ -90,7 +100,7 @@
             <a
                 href="#"
                 class="btn-product btn-cart"
-                :class="{'btn-disabled': !canAddToCart(product, qty) || (Object.keys(product.variants).length > 0 && !showVariationPrice) }"
+                :class="{'btn-disabled': !canAddToCart(product, qty) || (Object.keys(product.variants).length > 0 && !activeAddCartButton) }"
                 @click.prevent="addCart(0)"
             >
                 <span>add to cart</span>
@@ -120,15 +130,6 @@
         </div>
 
         <div class="product-details-footer">
-            <div class="product-cat w-100 text-truncate">
-                <span>Category:</span>
-                <span v-for="(cat, index) of product.category" :key="index">
-                    <nuxt-link
-                        :to="{path: '/shop?category=', query: {category: cat.alias}}"
-                    >{{ cat.descriptions_with_lang_default.title }}</nuxt-link>
-                    {{ index < product.category.length - 1 ? ',' : '' }}
-                </span>
-            </div>
 
             <div class="social-icons social-icons-sm">
                 <span class="social-label">Share:</span>
@@ -162,7 +163,7 @@
                             </nuxt-link>
                         </figure>
                         <h3 class="product-title">
-                            <nuxt-link :to="'/product/default/'+ product.slug">{{ product.name }}</nuxt-link>
+                            <nuxt-link class="txt-ellipsis" style="width: 340px;" :to="'/product/default/'+ product.slug">{{ product.name }}</nuxt-link>
                         </h3>
                     </div>
                     <div class="col-6 justify-content-end">
@@ -173,11 +174,11 @@
                                 <div class="product-nav product-nav-dots" style="margin-right:2rem;">
                                     <a :title="item.name"
                                         href="#"
-                                        :class="{active: item.color == selectedVariant.code, disabled: item.disabled}"
+                                        :class="{active: selectedVariant.hasOwnProperty(item.type) && index == selectedVariant[item.type].value_index, disabled: item.disabled}"
                                         :style="{'background-color': item.color}"
                                         v-for="(item, index) in product.variants.color"
                                         :key="index"
-                                        @click.prevent="selectColor(item)"
+                                        @click.prevent="selectAtttribute(item)"
                                     ></a>
                                 </div>
                             </div>  
@@ -189,12 +190,12 @@
                                         name="size"
                                         id="size"
                                         class="form-control"
-                                        @change="selectSize()"
+                                        @change="selectAtttribute()"
                                         v-model="selectedSize"
                                     >
                                         <option value="null" :selected="selectedVariant.size == null">Select a size</option>
                                         <option
-                                            :selected="selectedVariant.size == item.name"
+                                            :selected="selectedVariant.hasOwnProperty(item.type) && index == selectedVariant[item.type].value_index"
                                             :value="item"
                                             v-for="(item, index) in product.variants.size"
                                             :key="index"
@@ -202,9 +203,9 @@
                                     </select>
                                 </div>
                             </div>
-                            <vue-slide-toggle :open="showVariationPrice">
+                            <vue-slide-toggle :open="showClear">
                                 <div class="product-price" >
-                                {{ priceConvert(parseInt(selectedVariant.price_size)+parseInt(selectedVariant.price_color)) }}
+                                {{ priceConvert(sumAttrbutePrice) }}
                                 </div>
                             </vue-slide-toggle>
                             <a style="margin-right:2rem;" href="#" @click.prevent="clearSelection" v-if="showClear">clear</a>
@@ -214,7 +215,7 @@
                             <a
                                 href="#"
                                 class="btn-product btn-cart"
-                                :class="{'btn-disabled': !canAddToCart(product, qty) || (Object.keys(product.variants).length > 0 && !showVariationPrice) }"
+                                :class="{'btn-disabled': !canAddToCart(product, qty) || (Object.keys(product.variants).length > 0 && !activeAddCartButton) }"
                                 @click.prevent="addCart(0)"
                             >
                                 <span>add to cart</span>
@@ -252,14 +253,6 @@ import QuantityInput from '~/components/elements/QuantityInput';
 import { baseDomain } from '~/repositories/repository.js';
 import { priceConvert } from '~/utilities/common';
 
-const defaultVariant = {
-        size: null,
-        color: null,
-        code: null,
-        price_color: null,
-        price_size: null,
-}
-
 export default {
     components: {
         VueSlideToggle,
@@ -272,11 +265,10 @@ export default {
     },
     data: function() {
         return {
-            parentVariant:null,
             selectedSize:null,
             isSticky: false,
             baseDomain: baseDomain,
-            selectedVariant: Object.assign({},defaultVariant),
+            selectedVariant:{},
             maxPrice: 0,
             minPrice: 0,
             promoPrice: 0,
@@ -284,8 +276,6 @@ export default {
         };
     },
     mounted: function() {
-        let stickyContent = this.$el.lastChild;
-        this.$el.style.height = stickyContent.offsetHeight + 'px';
         window.addEventListener('scroll', this.scrollHandler, {
             passive: true
         });
@@ -298,9 +288,19 @@ export default {
         showClear: function() {
             return this.checkEnought();
         },
-        showVariationPrice: function() {
-            return this.checkEnought();
+        sumAttrbutePrice(){
+            let sum = 0;
+            for(let prop in this.selectedVariant){
+                let val = this.selectedVariant[prop].value_index;
+                sum += this.product.variants[prop][val].price;    
+            }
+            return (this.promoPrice > 0 ? this.promoPrice : this.product.price)+sum;
         },
+        activeAddCartButton(){
+            if (Object.keys(this.product.variants).length == Object.keys(this.selectedVariant).length) {
+                return true;
+            }
+        }
     },
     created: function() {
         let max = 0;
@@ -327,9 +327,6 @@ export default {
             this.minPrice = this.product.price;
             this.maxPrice = this.product.price+max;
         }
-        if (Object.keys(this.product.variants).length < 2) {
-            this.parentVariant = Object.keys(this.product.variants)[0]; 
-        }
     },
     methods: {
         priceConvert,
@@ -338,48 +335,30 @@ export default {
         ...mapActions('compare', ['addToCompare']),
         checkEnought(){
             let flag = true;
-            for(let index in this.selectedVariant){
-                if (!this.selectedVariant[index] && this.selectedVariant[index] != 0) {
-                    flag = false;
-                }
+            if (Object.keys(this.selectedVariant).length == 0) {
+                flag = false;
             }
             return flag;
         },
-        selectColor: function(item) {          
-            if (item.color != null && item.color[0] == this.selectedVariant.code) {
-                this.selectedVariant.price_color = null;
-                this.selectedVariant.color = '';
-                this.selectedVariant.code = '';
-                if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
-                    delete this.product.variants.size;
-                    this.selectedVariant.price_size = 0;
-                    this.selectedVariant.size = null;
-                    this.selectedSize = null;
-                }
-            } else {
-                this.selectedVariant.price_color = item.price;
-                this.selectedVariant.color = item.name;
-                this.selectedVariant.code = item.color != null ? item.color[0] : '';
-                if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
-                    this.selectedVariant.price_size = 0;
-                    this.selectedVariant.size = null;
-                    this.selectedSize = null;
-                    this.product.variants.size = item.children.size;
-                }
+        selectAtttribute: function(item = null) {         
+            if (item == null) {
+                item = this.selectedSize;
             }
-        },
-        selectSize: function() {
-            let item = this.selectedSize;
-            this.selectedVariant.price_size = item.price;
-            this.selectedVariant.size = item.name;
-            if(item.hasOwnProperty('children') && Object.keys(item.children).length > 0) {
-                this.product.variants.color = item.children.color;
+            if (item == 'null') {
+                this.selectedVariant = {};
+                return false;
             }
-            if (this.parentVariant == 'size') {
-                this.selectedVariant.price_color = 0;
-                this.selectedVariant.color = null;
-                if (this.selectedSize == 'null') {
-                    delete this.product.variants.color;
+            let type_index = this.product.variants[item.type].findIndex((res) => { return item.id == res.id; })
+            
+            this.$set(this.selectedVariant ,item.type,{ group_id : item.group_id , value_index : type_index });
+            if(item.hasOwnProperty('children')){
+                let key = Object.keys(item.children)[0];
+                this.product.variants = {...this.product.variants,...item.children};
+                if (this.selectedVariant.hasOwnProperty(key)) {
+                    delete this.selectedVariant[key];
+                }
+                if (key == 'size') {
+                    this.selectedSize = null;
                 }
             }
         },
@@ -387,20 +366,8 @@ export default {
             this.qty = current;
         },
         clearSelection: function() {
-            this.selectedVariant = {
-                ...this.selectedVariant,
-                size: null,
-                color: null,
-                code: null,
-                price_color: null,
-                price_size: null,
-            };
+            this.selectedVariant = {};
             this.selectedSize = null;
-            if (this.parentVariant == 'size') {
-                delete this.product.variants.color;
-            }else if(this.parentVariant == 'color'){
-                delete this.product.variants.size;
-            }
         },
         addCart: function(index = 0) {
             let newProduct = { ...this.product };
@@ -416,7 +383,7 @@ export default {
                 product: newProduct,
                 qty: this.qty
             });
-            this.selectedVariant = Object.assign({},defaultVariant);
+            this.selectedVariant = {};
             this.selectedSize = null;
         },
         scrollHandler: function() {
