@@ -9,12 +9,12 @@
             id="tab2"
         ></tabs>
         <div class="tab-content">
-            <div class="tab-pane fade show active p-0" id="tab2-all">
+            <div class="tab-pane fade show active p-0" id="tab2-latest">
                 <div class="products">
                     <div class="row">
                         <div
                             class="col-6 col-md-4 col-lg-3 col-xl-5col mb-n4"
-                            v-for="(product, index) in products"
+                            v-for="(product, index) in latestProducts"
                             :key="index"
                         >
                             <product-twelve :product="product"></product-twelve>
@@ -23,12 +23,12 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade p-0" id="tab2-furniture">
+            <div class="tab-pane fade p-0" id="tab2-viewed">
                 <div class="products">
                     <div class="row">
                         <div
                             class="col-6 col-md-4 col-lg-3 col-xl-5col mb-n4"
-                            v-for="(product, index) in furniture"
+                            v-for="(product, index) in viewedProducts"
                             :key="index"
                         >
                             <product-twelve :product="product"></product-twelve>
@@ -37,25 +37,12 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade p-0" id="tab2-decoration">
+            <div class="tab-pane fade p-0" id="tab2-bought">
                 <div class="products">
                     <div class="row">
                         <div
                             class="col-6 col-md-4 col-lg-3 col-xl-5col mb-n4"
-                            v-for="(product, index) in decoration"
-                            :key="index"
-                        >
-                            <product-twelve :product="product"></product-twelve>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade p-0" id="tab2-lighting">
-                <div class="products">
-                    <div class="row">
-                        <div
-                            class="col-6 col-md-4 col-lg-3 col-xl-5col mb-n4"
-                            v-for="(product, index) in lighting"
+                            v-for="(product, index) in boughtProducts"
                             :key="index"
                         >
                             <product-twelve :product="product"></product-twelve>
@@ -78,41 +65,39 @@ export default {
         ProductTwelve
     },
     props: {
-        products: Array
+        latestProducts: Array,
+        viewedProducts: Array,
+        boughtProducts: Array
     },
     data: function() {
         return {
             tabsData: [
                 {
-                    id: 'all',
-                    title: 'All',
+                    id: 'latest',
+                    title: 'Latest',
                     active: true
                 },
                 {
-                    id: 'furniture',
-                    title: 'Furniture'
+                    id: 'viewed',
+                    title: 'Most view',
                 },
                 {
-                    id: 'decoration',
-                    title: 'Decoration'
+                    id: 'bought',
+                    title: 'Hot'
                 },
-                {
-                    id: 'lighting',
-                    title: 'Lighting'
-                }
             ]
         };
     },
     computed: {
-        furniture: function() {
-            return catFilter(this.products, ['furniture']);
-        },
-        decoration: function() {
-            return catFilter(this.products, ['decoration']);
-        },
-        lighting: function() {
-            return catFilter(this.products, ['lighting']);
-        }
+        // furniture: function() {
+        //     return catFilter(this.products, ['furniture']);
+        // },
+        // decoration: function() {
+        //     return catFilter(this.products, ['decoration']);
+        // },
+        // lighting: function() {
+        //     return catFilter(this.products, ['lighting']);
+        // }
     }
 };
 </script>

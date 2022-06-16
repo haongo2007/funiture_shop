@@ -8,10 +8,10 @@
                 <span class="product-label label-out" v-if="product.stock === 0">Out Of Stock</span>
                 <img
                     id="product-zoom"
-                    v-lazy="`${baseDomain}${product.pictures[currentIndex]+'&w=575&h=575'}`"
+                    v-lazy="`${baseDomain}${product.pictures[currentIndex]+'&w=575'}`"
                     alt="product"
                     width="575"
-                    height="575"
+                    height="auto"
                 />
 
                 <a

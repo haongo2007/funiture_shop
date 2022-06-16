@@ -176,7 +176,7 @@ export default {
             },
             pageTitle:'Shop',
             products: [],
-            perPage: 12,
+            perPage: 0,
             type: '4cols',
             totalCount: 0,
             orderBy: 'default',
@@ -186,7 +186,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('store', ['titlePage']),
+        ...mapGetters('core', ['titlePage','getProducListDisplay']),
         containerClass: function() {
             if (this.$route.params.type == 'fullwidth')
                 return 'container-fluid';
@@ -199,26 +199,23 @@ export default {
     watch: {
         $route: function() {
             this.getProducts(true);
+        },
+        getProducListDisplay:function (newVal) {
+            if (this.perPage == 0) {
+                this.perPage = parseInt(this.getProducListDisplay.value);
+                this.getProducts();
+            }
         }
     },
-    created: function() {
-        this.getProducts();
-    },
-    destroyed() {
-      console.log('destroyed')
+    created() {
+        if (this.getProducListDisplay) {
+            this.perPage = parseInt(this.getProducListDisplay.value);
+            this.getProducts();
+        }
     },
     methods: {
         changeView(type){
             this.type = type;
-            if (type == 'list') {
-                this.perPage = 5;
-            } else if (type == '2cols') {
-                this.perPage = 6;
-            } else if (type == '3cols') {
-                this.perPage = 9;
-            } else if (type == '4cols') {
-                this.perPage = 12;
-            }
         },
         getProducts: async function(samePage = false, loadMore = false) {
             if (!loadMore) this.loaded = false;
@@ -274,7 +271,7 @@ export default {
 
         loadMore: function() {
             if (this.perPage < this.totalCount) {
-                this.perPage += 4;
+                this.perPage += parseInt(this.getProducListDisplay.value);
                 this.loadMoreLoading = true;
                 setTimeout(() => {
                     this.getProducts(false, true);

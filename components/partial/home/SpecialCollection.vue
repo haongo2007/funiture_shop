@@ -9,13 +9,13 @@
         </div>
         <div class="container-fluid">
             <div class="tab-content tab-content-carousel">
-                <div class="tab-pane fade show active" id="tab1-featured">
+                <div class="tab-pane fade show active" id="tab1-top">
                     <div class="swiper-carousel carousel-with-shadow swiper-1">
                         <div class="mb-0" v-swiper:swiper1="carouselSetting1">
                             <div class="swiper-wrapper">
                                 <div
                                     class="swiper-slide"
-                                    v-for="(product, index) in featuredProducts"
+                                    v-for="(product, index) in topProducts"
                                     :key="index"
                                 >
                                     <product-twelve :product="product"></product-twelve>
@@ -75,14 +75,16 @@ export default {
         ProductTwelve
     },
     props: {
-        products: Array
+        topProducts: Array,
+        saleProducts: Array,
+        ratedProducts: Array,
     },
     data: function() {
         return {
             tabsData: [
                 {
-                    id: 'featured',
-                    title: 'Featured',
+                    id: 'top',
+                    title: 'Top',
                     active: true
                 },
                 {
@@ -121,15 +123,15 @@ export default {
         };
     },
     computed: {
-        featuredProducts: function() {
-            return attrFilter(this.products, 'featured');
-        },
-        ratedProducts: function() {
-            return attrFilter(this.products, 'rated');
-        },
-        saleProducts: function() {
-            return attrFilter(this.products, 'sale');
-        }
+        // featuredProducts: function() {
+        //     return attrFilter(this.products, 'featured');
+        // },
+        // ratedProducts: function() {
+        //     return attrFilter(this.products, 'rated');
+        // },
+        // saleProducts: function() {
+        //     return attrFilter(this.products, 'sale');
+        // }
     }
 };
 </script>

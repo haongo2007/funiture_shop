@@ -89,7 +89,6 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('demo', ['currentDemo'])
     },
     mounted: function() {
         document
@@ -103,47 +102,47 @@ export default {
                 this.timeouts.map(timeout => {
                     window.clearTimeout(timeout);
                 });
-                this.timeouts.push(
-                    setTimeout(() => {
-                        Repository.get(`${baseUrl}/search`, {
-                            params: {
-                                searchTerm: searchTerm,
-                                demo: this.currentDemo
-                            }
-                        })
-                            .then(response => {
-                                this.suggestions = response.data.reduce(
-                                    (acc, cur) => {
-                                        let max = 0;
-                                        let min = 99999;
-                                        cur.variants.map(item => {
-                                            if (min > item.price)
-                                                min = item.price;
-                                            if (max < item.price)
-                                                max = item.price;
-                                        }, []);
+                // this.timeouts.push(
+                //     setTimeout(() => {
+                //         Repository.get(`${baseUrl}/search`, {
+                //             params: {
+                //                 searchTerm: searchTerm,
+                //                 demo: this.currentDemo
+                //             }
+                //         })
+                //             .then(response => {
+                //                 this.suggestions = response.data.reduce(
+                //                     (acc, cur) => {
+                //                         let max = 0;
+                //                         let min = 99999;
+                //                         cur.variants.map(item => {
+                //                             if (min > item.price)
+                //                                 min = item.price;
+                //                             if (max < item.price)
+                //                                 max = item.price;
+                //                         }, []);
 
-                                        if (cur.variants.length == 0) {
-                                            min = cur.sale_price
-                                                ? cur.sale_price
-                                                : cur.price;
-                                            max = cur.price;
-                                        }
-                                        return [
-                                            ...acc,
-                                            {
-                                                ...cur,
-                                                minPrice: min,
-                                                maxPrice: max
-                                            }
-                                        ];
-                                    },
-                                    []
-                                );
-                            })
-                            .catch(error => {});
-                    }, 500)
-                );
+                //                         if (cur.variants.length == 0) {
+                //                             min = cur.sale_price
+                //                                 ? cur.sale_price
+                //                                 : cur.price;
+                //                             max = cur.price;
+                //                         }
+                //                         return [
+                //                             ...acc,
+                //                             {
+                //                                 ...cur,
+                //                                 minPrice: min,
+                //                                 maxPrice: max
+                //                             }
+                //                         ];
+                //                     },
+                //                     []
+                //                 );
+                //             })
+                //             .catch(error => {});
+                //     }, 500)
+                // );
             } else {
                 this.timeouts.map(timeout => {
                     window.clearTimeout(timeout);

@@ -92,10 +92,6 @@ export default {
         proxy: true, 
     },
 
-    proxy: {
-        '/api/': 'http://localhost:8000',
-    },
-
     router: {
         base: '/',
         linkActiveClass: 'link-active',
@@ -105,7 +101,7 @@ export default {
     pageTransition: 'page',
 
     build: {
-        publicPath: 'http://localhost:4000'
+        publicPath: 'http://107.155.65.77:4000'
     },
 
     generate: {
@@ -119,4 +115,7 @@ export default {
         port: 4000,
         host: 'localhost'
     },
+    env: {
+        apiSecret: process.env.API_SECRET,
+    }
 };

@@ -6,7 +6,7 @@
                 :href="getUrl(tab)"
                 :class="{'active bg-white': tab.active}"
                 @click.prevent="tabClick(tab)"
-            >{{ tab.title }}</a>
+            >{{ tab.title }} {{ index == 3 ? '('+reviewCount+')' : '' }}</a>
         </li>
     </ul>
 </template>
@@ -14,7 +14,8 @@
 export default {
     props: {
         id: String,
-        data: Array
+        data: Array,
+        reviewCount: Number
     },
     data: function() {
         return {

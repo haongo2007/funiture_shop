@@ -325,18 +325,15 @@
                                                 >Ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis.</div>
                                             </vue-slide-toggle>
                                         </div> -->
+                                        <input v-validate="'required'" type="hidden" id="express-payment" name="payment" v-model="invoice.paymentMethod"/>
                                         <div class="card" v-for="(item,index) in getPaymentMethod" :key="index">
                                             <div class="card-header">
                                                 <h2 class="card-title">
-                                                    <a
-                                                        v-validate="'required'" 
-                                                        name="shipping"
-                                                        class="toggle-button"
+                                                    <a class="toggle-button"
                                                         :class="{expanded: togglePayment[index], collapsed: !togglePayment[index]}"
                                                         @click.prevent="changeTogglePayment(index)"
                                                         href="#"
                                                     >{{ item.title }}</a>
-                                                    <input type="hidden" name="payment" v-model="invoice.paymentMethod" v-validate="'required'">
                                                 </h2>
                                             </div>
 
@@ -469,7 +466,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters('store', ['getShippingMethod','getPaymentMethod']),
+        ...mapGetters('core', ['getShippingMethod','getPaymentMethod']),
         ...mapGetters('customer', ['getCurrentCustomer']),
         ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal','priceTax']),
         ...mapGetters('coupon', ['getCoupon']),
@@ -478,9 +475,9 @@ export default {
       getCurrentCustomer: function(newVal) {
         this.handleSetCurCustomer(newVal)
       },
-      '$store.state.store.info': function(newVal) {
+      getPaymentMethod: function(newVal) {
         if (newVal) {
-            for(let prop in newVal.payment_method) {
+            for(let prop in newVal) {
                 this.$set(this.togglePayment,prop,false);
             }
         }
@@ -519,6 +516,7 @@ export default {
         this.invoice.priceTotal = this.priceTotal;
         this.invoice.priceTax = this.priceTax;
         if (this.getCoupon.length) {
+            this.invoice.couponInUse = this.getCoupon;
             let sum = this.getCoupon.reduce( ( acc, cur ) => {
                 return acc + cur.value;
             }, 0 );
@@ -569,8 +567,8 @@ export default {
                     this.invoice.priceSubtotal = this.invoice.priceSubtotal + data.data.value;
                     this.invoice.priceTotal = this.invoice.priceTotal + data.data.value;
                     this.$vToastify.success( data.message );
-                }).catch(({response:{data}})=>{
-                    this.$vToastify.error( data.error );
+                }).catch(({error})=>{
+                    this.$vToastify.error( error );
                 })
             })
         },
@@ -590,7 +588,7 @@ export default {
                                 } );
                                 this.$vToastify.success(data.data.message);
                             }
-                        }).catch(({data})=>{
+                        }).catch(({error})=>{
                             this.proceedCheckout = false;
                             this.$vToastify.error('Order failed!');
                         })

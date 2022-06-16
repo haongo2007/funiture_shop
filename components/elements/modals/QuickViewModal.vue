@@ -28,7 +28,7 @@
                                             v-lazy="`${baseDomain}${picture}`"
                                             alt="product"
                                             width="150"
-                                            height="150"
+                                            height="auto"
                                         />
                                     </div>
                                 </div>
@@ -51,7 +51,7 @@
                                     v-lazy="`${baseDomain}${picture[0]}`"
                                     alt="dot"
                                     width="150"
-                                    height="150"
+                                    height="auto"
                                 />
                             </a>
                         </div>

@@ -168,7 +168,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters('store', ['logo']),
+        ...mapGetters('core', ['logo']),
         isFullwidth: function() {
             return this.$route.path.includes('fullwidth');
         }

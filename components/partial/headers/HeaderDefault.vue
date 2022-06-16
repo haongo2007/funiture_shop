@@ -73,7 +73,7 @@
 						class="logo"
 					>
 						<img
-							v-lazy="logo"
+							v-lazy="`${baseDomain}${logo}`+'&w=150'"
 							class="bg-transparent"
 							alt="Molla Logo"
 							width="104"
@@ -152,8 +152,14 @@ import HeaderSearch from '~/components/partial/headers/shared/HeaderSearch';
 import StickyHeader from '~/components/elements/StickyHeader';
 import CategoriesMenu from '~/components/elements/CategoriesMenu';
 import { mapGetters, mapActions } from 'vuex';
+import { baseDomain } from '~/repositories/repository';
 import Cookies from 'js-cookie';
 export default {
+    data: function() {
+        return {
+            baseDomain: baseDomain
+        };
+    },
 	components: {
 		CartMenu,
 		WishlistMenu,
@@ -164,36 +170,32 @@ export default {
 		CategoriesMenu
 	},
 	computed: {
-        ...mapGetters('store', ['logo']),
-        ...mapGetters('store', ['getLanguages']),
-        ...mapGetters('store', ['getCurrencies']),
-        ...mapGetters('store', ['getLang']),
-        ...mapGetters('store', ['getCurrency']),
-        ...mapGetters('store', ['getCategories']),
+        ...mapGetters('core', ['logo']),
+        ...mapGetters('core', ['getLanguages']),
+        ...mapGetters('core', ['getCurrencies']),
+        ...mapGetters('core', ['getLang']),
+        ...mapGetters('core', ['getCurrency']),
+        ...mapGetters('core', ['getCategories']),
         ...mapGetters('customer', ['getToken']),
         ...mapGetters('customer', ['getCurrentCustomer']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
 		},
 	},
-	watch: {
-	  '$store.state.store.info': function() {
-	  }
-	},
 	created(){
 	},
 	methods: {
 		changeCurrency(code){
 			Cookies.set('f-currency',code);
-            this.$store.dispatch('store/setCurrency',code);
+            this.$store.dispatch('core/setCurrency',code);
 		},
 		changeLanguage(code){
 			Cookies.set('f-language',code);
-            this.$store.dispatch('store/setLang',code);
+            this.$store.dispatch('core/setLang',code);
             this.$router.replace({
 	        	path: '/redirect' + this.$route.fullPath,
 	      	});
-            this.$store.dispatch('store/getInfoStore');
+            this.$store.dispatch('core/getInfoStore');
 		},
 		openSignInModal() {
 			this.$modal.show(

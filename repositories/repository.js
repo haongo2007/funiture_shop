@@ -1,7 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
-const domain = 'http://localhost:8000/';
+const domain = process.env.apiSecret || 'http://localhost:8000/';
 const domainPrefix = 'api';
 
 export const customHeaders = {
@@ -51,7 +50,7 @@ service.interceptors.response.use(
     return response.data;
   },
   error => {
-    return Promise.reject(error);
+    return Promise.reject(error.response.data);
   }
 );
 export default service;

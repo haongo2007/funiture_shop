@@ -17,24 +17,12 @@
 
                 <vue-slide-toggle :open="toggleStates[0]" class="show" :duration="200">
                     <div class="widget-body pt-0">
-                        <div class="filter-items filter-items-count">
-                            <div
-                                class="filter-item"
-                                v-for="(category, index) in filterData.categories"
-                                :key="index"
-                            >
-                                <nuxt-link
-                                    :to="{path: $route.path, query: {category: category.slug}}"
-                                    :class="{active: categorySelected(category)}"
-                                >{{ category.name }}</nuxt-link>
-                                <span class="item-count">{{ category.count }}</span>
-                            </div>
-                        </div>
+                        <categories-menu :data-categories="getCategories" is-position="shop"/>
                     </div>
                 </vue-slide-toggle>
             </div>
 
-            <div class="widget widget-collapsible">
+            <!-- <div class="widget widget-collapsible">
                 <h3 class="widget-title mb-2">
                     <a
                         href="#widget-2"
@@ -94,7 +82,59 @@
                         </div>
                     </div>
                 </vue-slide-toggle>
+            </div> -->
+
+            <div class="widget widget-collapsible" v-for="(item,index) in getAttributes" :key="index">
+                <h3 class="widget-title mb-2">
+                    <a
+                        href="#widget-3"
+                        :class="{collapsed: !toggleStates[index + 1]}"
+                        @click.prevent="toggleSlide(index + 1)"
+                    >{{ item.name }}</a>
+                </h3>
+
+                <vue-slide-toggle :open="toggleStates[index + 1]" class="show" :duration="200">
+                    <div class="widget-body pt-0" v-if="item.type == 'radio'">
+                        <div class="filter-colors">
+                            <nuxt-link
+                                v-for="(child, key) in item.attribute_details"
+                                v-if="child.active_palette"
+                                :to="getColorUrl(child)"
+                                :style="{'background-color': child.active_palette.hex}"
+                                :key="key"
+                                :class="{selected: colorSelected(child)}"
+                            >
+                                <span class="sr-only">{{ child.name }}</span>
+                            </nuxt-link>
+                        </div>
+                    </div>
+                    <div class="widget-body pt-0" v-else-if="item.type == 'select'">
+                        <div class="filter-items d-flex flex-wrap">
+                            <div
+                                style="width: 33%;"
+                                class="filter-item"
+                                v-for="(child, key) in item.attribute_details"
+                                :key="key"
+                            >
+                                <div class="custom-control custom-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        class="custom-control-input"
+                                        :id="item.name.toLowerCase()+'-' + key"
+                                        @click="setSizeFilter(child)"
+                                        :checked="sizeChecked(child)"
+                                    />
+                                    <label
+                                        class="custom-control-label"
+                                        :for="item.name.toLowerCase()+'-' + key"
+                                    >{{ child.name }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </vue-slide-toggle>
             </div>
+
 
             <div class="widget widget-collapsible">
                 <h3 class="widget-title mb-2">
@@ -110,7 +150,7 @@
                         <div class="filter-items">
                             <div
                                 class="filter-item"
-                                v-for="(item, index) in filterData.brands"
+                                v-for="(item, index) in getBrand"
                                 :key="index"
                             >
                                 <div class="custom-control custom-checkbox">
@@ -124,7 +164,7 @@
                                     <label
                                         class="custom-control-label"
                                         :for="'brand-' + index"
-                                    >{{ item.brand }}</label>
+                                    >{{ item.name }}</label>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +181,7 @@
                     >Price</a>
                 </h3>
 
-                <vue-slide-toggle :open="toggleStates[4]" class="show" :duration="200">
+                <vue-slide-toggle  v-if="getMaximumPrice" :open="toggleStates[4]" class="show" :duration="200">
                     <div class="widget-body pt-0">
                         <div class="filter-price">
                             <div class="filter-price-text d-flex justify-content-between">
@@ -149,7 +189,6 @@
                                     Price Range:
                                     <span id="filter-price-range">{{ priceRangeText }}</span>
                                 </span>
-                                <nuxt-link :to="priceFilterRoute" class="pr-2">Filter</nuxt-link>
                             </div>
 
                             <vue-nouislider
@@ -159,6 +198,10 @@
                                 v-if="loaded"
                             ></vue-nouislider>
                         </div>
+                            
+                        <nuxt-link :to="priceFilterRoute" class="pr-2">
+                            <a href="javascript:;" class="btn btn-outline-dark btn-rounded">Filter</a>
+                        </nuxt-link>
                     </div>
                 </vue-slide-toggle>
             </div>
@@ -169,10 +212,14 @@
 <script>
 import { VueSlideToggle } from 'vue-slide-toggle';
 import { shopData } from '~/utilities/data';
+import { mapGetters } from 'vuex';
+import CategoriesMenu from '~/components/elements/CategoriesMenu';
+import { priceConvert } from '~/utilities/common';
 
 export default {
     components: {
-        VueSlideToggle
+        VueSlideToggle,
+        CategoriesMenu
     },
     props: {
         isSidebar: Boolean
@@ -180,11 +227,11 @@ export default {
     data: function() {
         return {
             loaded: true,
-            priceValues: [0, 1000],
+            priceValues: [0,0],
             priceSliderConfig: {
                 connect: true,
                 step: 50,
-                margin: 100,
+                margin: 50,
                 range: {
                     min: 0,
                     max: 1000
@@ -195,12 +242,11 @@ export default {
         };
     },
     computed: {
+        ...mapGetters('core', ['getBrand','getCategories','getMaximumPrice','getAttributes']),
         priceRangeText: function() {
             return (
-                '$' +
-                parseInt(this.priceValues[0]) +
-                ' — $' +
-                parseInt(this.priceValues[1])
+                this.priceConvert(this.priceValues[0]) + ' - ' +
+                this.priceConvert(this.priceValues[1])
             );
         },
         priceFilterRoute: function() {
@@ -225,6 +271,15 @@ export default {
             };
         }
     },
+    watch: {
+      getMaximumPrice: function(newVal) {
+        this.priceValues = [0,newVal];
+        this.priceSliderConfig.range.max = newVal;     
+      },
+      getAttributes: function(newVal) {
+
+      },
+    },
     created: function() {
         document
                 .querySelector('body')
@@ -245,9 +300,13 @@ export default {
             this.$nextTick(function() {
                 this.loaded = true;
             });
+
+            this.priceValues = [0,this.getMaximumPrice];
+            this.priceSliderConfig.range.max = this.getMaximumPrice;   
         }
     },
     methods: {
+        priceConvert,
         cleanAll: function() {
             this.loaded = false;
             this.priceValues = [0, 1000];
@@ -266,25 +325,19 @@ export default {
         sizeChecked: function(item) {
             return (
                 this.$route.query.size &&
-                this.$route.query.size.split(',').includes(item.slug)
+                this.$route.query.size.split(',').includes(item.name)
             );
         },
         brandChecked: function(item) {
             return (
                 this.$route.query.brand &&
-                this.$route.query.brand.split(',').includes(item.slug)
-            );
-        },
-        categorySelected: function(item) {
-            return (
-                this.$route.query.category &&
-                this.$route.query.category == item.slug
+                this.$route.query.brand.split(',').includes(item.alias)
             );
         },
         colorSelected: function(item) {
             return (
                 this.$route.query.color &&
-                this.$route.query.color.split(',').includes(item.color_name)
+                this.$route.query.color.split(',').includes(item.name)
             );
         },
         setSizeFilter: function(item) {
@@ -302,20 +355,20 @@ export default {
             if (!this.$route.query.size) {
                 query = {
                     ...query,
-                    size: item.slug
+                    size: item.name
                 };
-            } else if (this.$route.query.size.split(',').includes(item.slug)) {
+            } else if (this.$route.query.size.split(',').includes(item.name)) {
                 query = {
                     ...query,
                     size: query.size
                         .split(',')
-                        .filter(slug => slug !== item.slug)
+                        .filter(slug => slug !== item.name)
                         .join(',')
                 };
             } else {
                 query = {
                     ...query,
-                    size: [...query.size.split(','), item.slug].join(',')
+                    size: [...query.size.split(','), item.name].join(',')
                 };
             }
 
@@ -339,20 +392,20 @@ export default {
             if (!this.$route.query.brand) {
                 query = {
                     ...query,
-                    brand: item.slug
+                    brand: item.alias
                 };
-            } else if (this.$route.query.brand.split(',').includes(item.slug)) {
+            } else if (this.$route.query.brand.split(',').includes(item.alias)) {
                 query = {
                     ...query,
                     brand: query.brand
                         .split(',')
-                        .filter(slug => slug !== item.slug)
+                        .filter(alias => alias !== item.alias)
                         .join(',')
                 };
             } else {
                 query = {
                     ...query,
-                    brand: [...query.brand.split(','), item.slug].join(',')
+                    brand: [...query.brand.split(','), item.alias].join(',')
                 };
             }
 
@@ -367,16 +420,16 @@ export default {
             if (!this.$route.query.color) {
                 query = {
                     ...this.$route.query,
-                    color: item.color_name
+                    color: item.name
                 };
             } else if (
-                this.$route.query.color.split(',').includes(item.color_name)
+                this.$route.query.color.split(',').includes(item.name)
             ) {
                 query = {
                     ...this.$route.query,
                     color: this.$route.query.color
                         .split(',')
-                        .filter(slug => slug !== item.color_name)
+                        .filter(slug => slug !== item.name)
                         .join(',')
                 };
             } else {
@@ -384,7 +437,7 @@ export default {
                     ...this.$route.query,
                     color: [
                         ...this.$route.query.color.split(','),
-                        item.color_name
+                        item.name
                     ].join(',')
                 };
             }

@@ -127,11 +127,9 @@ export const mobileMenu = function () {
         } );
     }
 
-    items = document.querySelectorAll( ".mmenu-btn" );
-    for ( let i = 0; i < items.length; i++ ) {
-        let item = items[ i ];
-
-        item.addEventListener( "click", function ( e ) {
+    document.querySelector('.mobile-cats-nav').addEventListener( "click", function ( e ) {
+        let item = e.srcElement;
+        if (item.className == 'mmenu-btn') {
             let parent = item.parentElement.parentElement;
             let targetUI = parent.querySelector( "ul" );
             targetUI.setAttribute( "style", "display: block; visibility: hidden;" );
@@ -144,6 +142,7 @@ export const mobileMenu = function () {
             }
 
             if ( !parent.classList.contains( 'open' ) ) {
+                item.setAttribute( "style", "transform: rotate(180deg)" );
                 let height = 0;
                 let timerID = setInterval( () => {
                     if ( targetHeight <= height ) {
@@ -159,6 +158,7 @@ export const mobileMenu = function () {
 
                 parent.classList.add( 'open' );
             } else {
+                item.setAttribute( "style", "transform: rotate(0deg)" );
                 let height = targetHeight;
                 let timerID = setInterval( () => {
                     if ( height <= 0 ) {
@@ -177,13 +177,15 @@ export const mobileMenu = function () {
 
             e.stopPropagation();
             e.preventDefault();
-        } );
-    }
+        }
+    } );
 }
 
 export const priceConvert = function(price) {
-    let currency = window.$nuxt.$store.state.store.currency;
-    price = price * currency.exchange_rate;
-    price = price.toFixed(2);
-    return currency.symbol+price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, currency.thousands);
+    let currency = window.$nuxt.$store.state.core.localized.currency;
+    if(currency){
+        price = price * currency.exchange_rate;
+        price = price.toFixed(2);
+        return currency.symbol+price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, currency.thousands);
+    }
 }

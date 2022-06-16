@@ -39,13 +39,13 @@
                                             <div class="product">
                                                 <figure class="product-media">
                                                     <nuxt-link
-                                                        :to="'/product/default/' + product.slug"
+                                                        :to="'/product/' + product.slug"
                                                     >
                                                         <img
                                                             v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'"
                                                             alt="Product"
                                                             width="150"
-                                                            height="150"
+                                                            height="auto"
                                                         />
                                                     </nuxt-link>
                                                 </figure>
@@ -53,7 +53,7 @@
                                                 <h3 class="product-title">
                                                     <nuxt-link
                                                         class="txt-ellipsis"
-                                                        :to="'/product/default/' + product.slug"
+                                                        :to="'/product/' + product.slug"
                                                     >{{ product.name }}</nuxt-link>
                                                 </h3>
                                             </div>
@@ -139,8 +139,8 @@
                                 <table class="table table-summary">
                                     <tbody>
                                         <tr class="summary-subtotal">
-                                            <td>Total:</td>
-                                            <td v-if="subTotal">{{ priceConvert(subTotal) }}</td>
+                                            <td>Subtotal:</td>
+                                            <td v-if="priceTotal">{{ priceConvert(priceTotal) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -178,8 +178,8 @@
                                     <tbody>
                                         
                                         <tr class="summary-subtotal">
-                                            <td>Subtotal:</td>
-                                            <td>{{ priceConvert(subTotal + shipping) }}</td>
+                                            <td>Total:</td>
+                                            <td>{{ priceConvert(total + shipping) }}</td>
                                         </tr>
 
                                         <tr class="summary-shipping-estimate">
@@ -247,7 +247,7 @@ export default {
             baseDomain: baseDomain,
             shipping: 0,
             coupon:'',
-            subTotal:0,
+            total:0,
         };
     },
     computed: {
@@ -260,23 +260,23 @@ export default {
             this.cartItems = [...this.cartList];
         },
         getCoupon: function() {
-            this.subTotal = this.priceTotal;
+            this.total = this.priceTotal;
             if (this.getCoupon.length) {
                 let sum = this.getCoupon.reduce( ( acc, cur ) => {
                     return acc + cur.value;
                 }, 0 );
-                this.subTotal = sum + this.priceTotal;
+                this.total = sum + this.priceTotal;
             }
         },
     },
     created: function() {
         this.cartItems = [...this.cartList];
-        this.subTotal = this.priceTotal;
+        this.total = this.priceTotal;
         if (this.getCoupon.length) {
             let sum = this.getCoupon.reduce( ( acc, cur ) => {
                 return acc + cur.value;
             }, 0 );
-            this.subTotal = sum + this.priceTotal;
+            this.total = sum + this.priceTotal;
         }
     },
     methods: {
@@ -313,7 +313,7 @@ export default {
                 Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon,total:this.priceTotal}).then((data)=>{
                     this.checkedCoupon = false;
                     this.addCoupon(data.data)
-                    this.subTotal = this.subTotal + data.data.value;
+                    this.total = this.total + data.data.value;
                     this.$vToastify.success( data.message );
                 }).catch(({response:{data}})=>{
                     this.checkedCoupon = false;

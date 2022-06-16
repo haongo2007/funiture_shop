@@ -74,8 +74,8 @@ export default {
             },
             false
         );
-        if (Object.keys(this.info()).length === 0) {
-            this.$store.dispatch('store/getInfoStore').then(response => {
+        if (!this.shop_info) {
+            this.$store.dispatch('core/getInfoStore').then(response => {
                 // set meta
                 this.head.titleTemplate = this.titlePage();
                 this.head.title = this.titlePage();
@@ -87,12 +87,11 @@ export default {
         }
     },
     computed:{
-        ...mapGetters('store', ['getLang']),
-        ...mapGetters('store', ['getCurrency']),
+        ...mapGetters('core', ['shop_info']),
+        ...mapGetters('core', ['getCurrency']),
     },
     methods: {
-        ...mapGetters('store', ['info']),
-        ...mapGetters('store', ['titlePage']),
+        ...mapGetters('core', ['titlePage']),
         scrollTop: function() {
             if (isSafariBrowser() || isEdgeBrowser()) {
                 let pos = window.pageYOffset;

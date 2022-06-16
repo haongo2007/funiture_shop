@@ -19,6 +19,9 @@ export const getters = {
     getCurrentCustomer: state => {
         return state.customer;
     },
+    getCurrentFullname: state => {
+        return state.customer.first_name+' '+state.customer.last_name;
+    }
 }
 
 export const actions = {

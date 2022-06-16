@@ -29,7 +29,7 @@ Vue.use( VueLazyLoad, {
                     padding = listener.el.getAttribute( 'height' ) / listener.el.getAttribute( 'width' ) * 100;
                 if ( listener.el.nodeName == 'IMG' ) {
                     listener.el.style.paddingTop = padding + '%';
-                    listener.el.style.height = 0;
+                    listener.el.style.height = listener.el.height;
                 }
             }
         },
@@ -41,6 +41,7 @@ function handler ( el ) {
     let interval = window.setInterval( () => {
         if ( el.currentSrc || num == 100 ) {
             el.removeAttribute( 'style' );
+
             if ( !el.classList.contains( 'product-image-hover' ) ) {
                 el.classList.add( 'fade-in' );
             }

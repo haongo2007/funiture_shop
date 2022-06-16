@@ -158,7 +158,7 @@
                                     v-lazy="`${baseDomain}${product.pictures[0]+'&w=150&h=150'}`"
                                     alt="Product"
                                     width="150"
-                                    height="150"
+                                    height="auto"
                                 />
                             </nuxt-link>
                         </figure>
@@ -284,7 +284,7 @@ export default {
         ...mapGetters('cart', ['canAddToCart']),
         ...mapGetters('wishlist', ['isInWishlist']),
         ...mapGetters('compare', ['isInCompare']),
-        ...mapGetters('store', ['getCurrency']),
+        ...mapGetters('core', ['getCurrency']),
         showClear: function() {
             return this.checkEnought();
         },

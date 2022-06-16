@@ -25,7 +25,7 @@
                     </div>
                 </div>
 
-                <info-one v-if="product" :descriptions="product.short_desc"></info-one>
+                <info-one v-if="product" :descriptions="product.short_desc" :product-id="product.id" :review-list="product.reviewList" :review-count="product.review"></info-one>
 
                 <related-products-one :products="relatedProducts"></related-products-one>
             </div>
@@ -60,7 +60,7 @@ export default {
                 title: '',
                 meta: [
                     {
-                        hid: '',
+                        id: '',
                         name: '',
                         content:''
                     },
@@ -79,11 +79,26 @@ export default {
             ProductGallery:'',
         };
     },
+    computed:{
+        ...mapGetters('core', ['titlePage']),
+        metaData(){
+            if ( this.product != null) {
+                return [this.product.name,this.titlePage];
+            }
+        }
+    },
+    watch:{
+        metaData(newVal){
+            if (newVal[0] != '' && newVal[1] != '' && this.head.title !== null) {
+                this.head.titleTemplate = newVal[0] + ' | ' + newVal[1];
+                this.head.title =  newVal[0] + ' | ' + newVal[1];
+            }
+        }
+    },
     created: function() {
         this.getProduct();
     },
     methods: {
-        ...mapGetters('store', ['titlePage']),
         getProduct: async function() {
             this.loaded = false;
             await Repository.get(
@@ -91,10 +106,7 @@ export default {
             )
                 .then(response => {
                     this.product = { ...response.data.product };
-                    if (Object.keys(this.product).length) {
-                        this.head.titleTemplate = this.product.name + ' | ' + this.titlePage();
-                        this.head.title =  this.product.name + ' | ' + this.titlePage();
-                    }else{
+                    if (!Object.keys(this.product).length) {
                         this.$router.push({path: '/pages/404'});
                     }
                     this.relatedProducts = [...response.data.relatedProducts];

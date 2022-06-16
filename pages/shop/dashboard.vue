@@ -126,7 +126,7 @@ export default {
         };
     },
     watch: {
-        '$store.state.customer.token': function(value) {
+        getToken: function(value) {
             if (value == '') {
                 this.$router.replace({
                     path: '/redirect/',

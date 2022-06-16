@@ -32,7 +32,7 @@
             <div v-swiper:swiper2="carouselSetting2">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="(brand, index) in getBrand" :key="index">
-                        <nuxt-link :to="'/store?brands='+brand.alias" class="brand">
+                        <nuxt-link :to="'/shop?brand='+brand.alias" class="brand">
                             <img
                                 v-lazy="baseDomain+brand.image"
                                 class="bg-white"
@@ -49,9 +49,9 @@
         <div class="banner-group">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-6 col-lg-5" v-if="getBanner[0]">
-                        <div class="banner banner-large banner-overlay banner-overlay-light banner-1">
-                            <a :href="getBanner[1].url">
+                    <div class="col-sm-6 col-lg-5" v-if="getBanner.hasOwnProperty(0)">
+                        <div class="banner banner-large banner-overlay banner-overlay-light banner-1" >
+                            <a :href="getBanner[0].url">
                                 <img
                                     v-lazy="baseDomain+getBanner[0].image"
                                     width="470"
@@ -71,41 +71,35 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-sm-6 col-lg-3" v-if="getBanner[1]">
-                        <div class="banner banner-overlay banner-2">
+                    <div class="col-sm-6 col-lg-3" v-if="getBanner.hasOwnProperty(1)">
+                        <div class="banner banner-large banner-overlay banner-overlay-light banner-1" >
                             <a :href="getBanner[1].url">
                                 <img
                                     v-lazy="baseDomain+getBanner[1].image"
-                                    width="290"
+                                    width="470"
                                     height="510"
                                     alt="Banner"
                                 />
                             </a>
-
                             <div v-html="getBanner[1].html" v-if="getBanner[1].html"></div>
+                            <div class="banner-content banner-content-top" v-else>
 
-                            <div class="banner-content banner-content-bottom" v-else>
+                                <h3 class="banner-title">{{ getBanner[1].title }}</h3>
 
-                                <h3 class="banner-title text-white">
-                                    {{ getBanner[1].title }}
-                                </h3>
-
-                                <a :href="getBanner[1].url" class="btn btn-outline-white banner-link" >
-                                    Discover Now
+                                <a :href="getBanner[1].url" class="btn btn-outline-gray banner-link">
+                                    Shop Now
                                     <i class="icon-long-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-sm-12 col-md-12 col-lg-4" v-if="getBanner[2]">
+                    <div class="col-sm-12 col-md-12 col-lg-4" v-if="getBanner.hasOwnProperty(2)">
                         <div class="row">
                             <div class="col-lg-12 col-md-6 col-sm-6">
                                 <div class="banner banner-overlay banner-3">
                                     <a :href="getBanner[2].url">
                                         <img
-                                            v-lazy="baseDomain+getBanner[2].image"
+                                            v-lazy="baseDomain+getBanner[2].image+'&=370'"
                                             width="370"
                                             height="245"
                                             alt="Banner"
@@ -113,35 +107,31 @@
                                     </a>
 
                                     <div v-html="getBanner[2].html" v-if="getBanner[2].html"></div>
-
                                     <div class="banner-content banner-content-top" v-else>
-                                        <h4 class="banner-subtitle text-grey">New Arrivals</h4>
 
-                                        <h3 class="banner-title text-white">
-                                            {{ getBanner[2].title }}
-                                        </h3>
+                                        <h3 class="banner-title">{{ getBanner[2].title }}</h3>
 
-                                        <a :href="getBanner[2].url" class="btn btn-outline-white banner-link">
-                                            Discover Now
+                                        <a :href="getBanner[2].url" class="btn btn-outline-gray banner-link">
+                                            Shop Now
                                             <i class="icon-long-arrow-right"></i>
                                         </a>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-12 col-md-6 col-sm-6" v-if="getBanner[3]">
+                            <div class="col-lg-12 col-md-6 col-sm-6" v-if="getBanner.hasOwnProperty(3)">
                                 <div class="banner banner-overlay banner-overlay-light banner-4">
                                     <a :href="getBanner[3].url">
                                         <img
-                                            v-lazy="baseDomain+getBanner[3].image"
-                                            width="370"
-                                            height="245"
+                                            style="height: 245px;"
+                                            v-lazy="baseDomain+getBanner[3].image+'&w=370'"
+                                            :width="370"
+                                            :height="245"
                                             alt="Banner"
                                         />
                                     </a>
 
                                     <div v-html="getBanner[3].html" v-if="getBanner[3].html"></div>
-
                                     <div class="banner-content banner-content-top" v-else>
 
                                         <h3 class="banner-title">{{ getBanner[3].title }}</h3>
@@ -155,62 +145,39 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-sm-6 col-lg-3" v-if="getBanner[5]" v-for="(item,index) in getBanner">
-                        <div class="banner banner-large banner-overlay banner-overlay-light banner-1" v-if="index > 4">
-                            <a :href="item.url">
-                                <img
-                                    v-lazy="baseDomain+item.image"
-                                    width="470"
-                                    height="510"
-                                    alt="Banner"
-                                />
-                            </a>
-                            <div v-html="item.html" v-if="item.html"></div>
-                            <div class="banner-content banner-content-top" v-else>
-
-                                <h3 class="banner-title">{{ item.title }}</h3>
-
-                                <a :href="item.url" class="btn btn-outline-gray banner-link">
-                                    Shop Now
-                                    <i class="icon-long-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <special-collection :products="products" v-if="loaded"></special-collection>
+        <special-collection :top-products="topProducts" :rated-products="topRatedProducts" :sale-products="saleProducts" v-if="loaded"></special-collection>
 
         <div class="bg-light deal-container pt-5 pb-3 mb-6">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-9">
+                    <div class="col-lg-9" v-if="flashSaleProducts" v-for="(item,index) in flashSaleProducts" :key="index">
                         <div class="deal">
                             <div class="deal-content">
                                 <h4>Limited Quantities</h4>
                                 <h2>Deal of the Day</h2>
 
                                 <h3 class="product-title">
-                                    <nuxt-link to="/shop/sidebar/list">POÄNG</nuxt-link>
+                                    <nuxt-link :to="'/product/'+item.product.slug">{{ item.product.short_desc.name }}</nuxt-link>
                                 </h3>
 
                                 <div class="product-price">
-                                    <span class="new-price">$149.00</span>
-                                    <span class="old-price">Was $240.00</span>
+                                    <span class="new-price">{{ priceConvert(item.product.sale_price.price_promotion) }}</span>
+                                    <span class="old-price">Was {{ priceConvert(item.product.price) }}</span>
                                 </div>
 
                                 <count-down
                                     wrap="deal-countdown"
-                                    until="+10h"
-                                    format="HMS"
+                                    :until="'+'+convertBetweenDateToSecond(new Date(),item.product.sale_price.date_end)+'s'"
+                                    format="DHMS"
                                     :relative="true"
                                     :labelsShort="true"
                                 ></count-down>
 
-                                <nuxt-link to="/shop/sidebar/list" class="btn btn-primary">
+                                <nuxt-link :to="'/product/'+item.product.slug" class="btn btn-primary">
                                     <span>Shop Now</span>
                                     <i class="icon-long-arrow-right"></i>
                                 </nuxt-link>
@@ -218,13 +185,13 @@
 
                             <div class="deal-image">
                                 <nuxt-link
-                                    to="/shop/sidebar/list"
+                                    :to="'/product/'+item.product.slug"
                                     class="justify-content-center d-flex"
                                 >
                                     <img
-                                        v-lazy="'./images/home/deal/product-1.jpg'"
+                                        v-lazy="baseDomain+item.product.pictures[0]"
                                         width="440"
-                                        height="460"
+                                        height="auto"
                                         alt="image"
                                     />
                                 </nuxt-link>
@@ -241,7 +208,7 @@
                                     v-lazy="'./images/home/banners/banner-5.jpg'"
                                     alt="Banner"
                                     width="280"
-                                    height="500"
+                                    height="473"
                                 />
                             </nuxt-link>
 
@@ -263,7 +230,7 @@
             </div>
         </div>
 
-        <top-collection :products="topProducts" v-if="loaded"></top-collection>
+        <top-collection :viewed-products="mostViewProducts" :latest-products="latestProducts" :bought-products="mostBuyProducts" v-if="loaded"></top-collection>
 
         <blog-section :blogs="blogs" v-if="loaded"></blog-section>
         <div class="icon-boxes-container">
@@ -375,6 +342,8 @@ import SpecialCollection from '~/components/partial/home/SpecialCollection';
 import TopCollection from '~/components/partial/home/TopCollection';
 import BlogSection from '~/components/partial/home/BlogSection';
 import NewsletterModal from '~/components/elements/modals/NewsletterModal';
+import { priceConvert } from '~/utilities/common';
+
 
 import Repository, { baseUrl,baseDomain } from '~/repositories/repository.js';
 import { attrFilter } from '~/utilities/common';
@@ -395,9 +364,15 @@ export default {
         return {
             baseDomain:baseDomain,
             loaded: false,
-            products: [],
             topProducts: [],
+            latestProducts: [],
+            mostViewProducts: [],
+            mostBuyProducts: [],
+            topRatedProducts: [],
+            saleProducts: [],
+            flashSaleProducts:[],
             blogs: [],
+            reBanner: [],
             showCarousel1:false,
             carouselSetting1:{
                 ...carouselSettingSingle,
@@ -429,17 +404,12 @@ export default {
     },
     computed: {
         ...mapGetters('demo', ['newsletterShow']),
-        ...mapGetters('store', ['getSlider']),
-        ...mapGetters('store', ['getBrand']),
-        ...mapGetters('store', ['getBanner'])
-    },
-    watch: {
-      '$store.state.store.slider': function() {
-        
-      }
+        ...mapGetters('core', ['getSlider']),
+        ...mapGetters('core', ['getBrand']),
+        ...mapGetters('core', ['getBanner']),
     },
     created: function() {
-        // this.getProducts();
+        this.getProducts();
         this.showCarousel1 = true;
     },
     mounted: function() {
@@ -456,13 +426,32 @@ export default {
         // }
     },
     methods: {
+        priceConvert,
+        convertBetweenDateToSecond(start,end){
+            let diff = (new Date(start).getTime() - new Date(end).getTime()) / 1000;
+            return Math.abs(Math.round(diff));
+        },
         getProducts: async function() {
             this.loaded = false;
-            await Repository.get(`${baseUrl}/product/beege-bage`)
-                .then(response => {
-                    this.products = response.data.products;
-                    this.topProducts = attrFilter(this.products, 'top');
-                    this.blogs = response.data.blogs;
+            await Repository.get(`${baseUrl}/product/special`,{
+                params: {
+                    'top': true,
+                    'top_rated': true,
+                    'sale': true,
+                    'most_view': true,
+                    'most_buy': true,
+                    'flash_sale': true,
+                    'latest': true,
+                }
+            })
+                .then(({data}) => {
+                    this.topProducts = data.topProducts;
+                    this.topRatedProducts = data.topRatedProducts;
+                    this.saleProducts = data.saleProducts;
+                    this.mostViewProducts = data.mostViewProducts;
+                    this.mostBuyProducts = data.mostBuyProducts;
+                    this.flashSaleProducts = data.flashSaleProducts;
+                    this.latestProducts = data.latestProducts;
                     this.loaded = true;
                 })
                 .catch(error => ({ error: JSON.stringify(error) }));

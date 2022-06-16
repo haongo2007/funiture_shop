@@ -68,7 +68,7 @@
                     </div>
                     
                     <template v-else>
-                        <div class="product-price" v-if="product.sale_price.hasOwnProperty('price_promotion')">
+                        <div class="product-price" v-if="product.sale_price">
                             <span class="new-price">{{ priceConvert(product.sale_price.price_promotion) }}</span>
                             <span class="old-price">{{ priceConvert(product.price) }}</span>
                         </div>

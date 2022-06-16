@@ -43,18 +43,18 @@
 							<td class="product-col">
 								<div class="product">
 									<figure class="product-media">
-										<nuxt-link :to="'/product/default/' + product.slug">
+										<nuxt-link :to="'/product/' + product.slug">
 											<img
 												v-lazy="`${baseDomain}${product.pictures[0]}`+'&w=150&h=150'"
 												alt="Product"
 												width="150"
-												height="150"
+												height="auto"
 											/>
 										</nuxt-link>
 									</figure>
 
 									<h3 class="product-title">
-										<nuxt-link :to="'/product/default/' + product.slug">{{ product.name }}</nuxt-link>
+										<nuxt-link :to="'/product/' + product.slug">{{ product.name }}</nuxt-link>
 									</h3>
 								</div>
 							</td>
@@ -94,7 +94,7 @@
 								<div class="dropdown">
 									<nuxt-link
 										class="btn btn-block btn-outline-primary-2"
-										:to="'/product/default/' + product.slug"
+										:to="'/product/' + product.slug"
 										v-if="product.variants.length > 0"
 									>
 										<i class="icon-list-alt"></i>Select Options
