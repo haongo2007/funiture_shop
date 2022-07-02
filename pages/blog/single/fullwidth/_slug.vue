@@ -347,7 +347,7 @@
     </main>
 </template>
 <script>
-import Sticky from 'vue-sticky-directive';
+import Sticky from '~/plugins/vue-sticky-directive';
 import BlogOne from '~/components/elements/blogs/BlogOne';
 import Repository, { baseUrl } from '~/repositories/repository.js';
 import { carouselSetting1, carouselSettingSingle } from '~/utilities/carousel';

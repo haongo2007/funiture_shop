@@ -41,7 +41,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import Sticky from 'vue-sticky-directive';
+import Sticky from '~/plugins/vue-sticky-directive';
 
 import GalleryHorizontal from '~/components/partial/product/gallery/GalleryHorizontal';
 import DetailOne from '~/components/partial/product/details/DetailOne';

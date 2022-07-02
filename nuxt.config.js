@@ -84,8 +84,9 @@ export default {
         { src: '~/plugins/nouislider.js', ssr: false },
         { src: '~/plugins/debounce.js', ssr: false },
         { src: '~/plugins/validate.js', ssr: false },
+        { src: '~/plugins/sticky.js', ssr: false },
+        { src: '~/plugins/i18n.js', ssr: false }
     ],
-
     modules: [ '@nuxtjs/axios' ],
 
     axios: {
@@ -100,10 +101,13 @@ export default {
 
     pageTransition: 'page',
 
+<<<<<<< HEAD
     build: {
         publicPath: 'https://bepetshop.ecommflex.com'
     },
 
+=======
+>>>>>>> 69c78336a92116b56061c2614aa766f730512924
     generate: {
         subFolders: false,
         fallback: '404.html'

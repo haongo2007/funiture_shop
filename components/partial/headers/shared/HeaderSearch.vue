@@ -9,11 +9,11 @@
             action="#"
             method="get"
             @click.stop="showSearchForm"
-            @submit.prevent="submitSearchForm"
         >
             <div class="header-search-wrapper search-wrapper-wide">
                 <label for="q" class="sr-only">Search</label>
                 <input
+                    autocomplete="off"
                     type="text"
                     class="form-control"
                     name="q"
@@ -23,7 +23,7 @@
                     v-model="searchTerm"
                     @input="searchProducts"
                 />
-                <button class="btn btn-primary" type="submit">
+                <button class="btn btn-primary" type="button" @click="submitSearchForm">
                     <span class="sr-only">Search</span>
                     <i class="icon-search"></i>
                 </button>
@@ -33,42 +33,16 @@
                 <div
                     class="autocomplete-suggestions"
                     v-if="suggestions.length > 0"
-                    @click="goProductPage"
                 >
                     <nuxt-link
-                        :to="'/product/default/' + product.slug"
+                        :to="item.path"
                         class="autocomplete-suggestion"
                         data-index="0"
-                        v-for="product in suggestions"
-                        :key="product.id"
+                        v-for="(item,index) in suggestions"
+                        :key="index"
                     >
-                        <img
-                            :src="`${baseUrl}${product.sm_pictures[0].url}`"
-                            alt="
-								Product
-							"
-                            width="40"
-                            height="40"
-                            class="product-image"
-                        />
-
-                        <div class="search-name" v-html="matchEmphasize(product.name)"></div>
-                        <span class="search-price">
-                            <div
-                                class="product-price mb-0"
-                                v-if="product.minPrice == product.maxPrice"
-                            >${{ product.minPrice.toFixed(2) }}</div>
-                            <template v-else>
-                                <div class="product-price mb-0" v-if="product.variants.length == 0">
-                                    <span class="new-price">${{ product.minPrice.toFixed(2) }}</span>
-                                    <span class="old-price">${{ product.maxPrice.toFixed(2) }}</span>
-                                </div>
-                                <div
-                                    class="product-price mb-0"
-                                    v-else
-                                >${{product.minPrice.toFixed(2)}} - ${{product.maxPrice.toFixed(2)}}</div>
-                            </template>
-                        </span>
+                        <div class="search-name" v-html="matchEmphasize(item.name)"></div>
+                        
                     </nuxt-link>
                 </div>
             </div>
@@ -89,65 +63,35 @@ export default {
         };
     },
     computed: {
+        routes() {
+          return this.$router.options.routes;
+        } 
     },
     mounted: function() {
         document
             .querySelector('body')
             .addEventListener('click', this.closeSearchForm);
+
+        this.suggestions = [...this.routes].splice(0,12);
     },
     methods: {
         searchProducts: function() {
             if (this.searchTerm.length > 2) {
                 var searchTerm = this.searchTerm;
+                var data = [];
                 this.timeouts.map(timeout => {
                     window.clearTimeout(timeout);
                 });
-                // this.timeouts.push(
-                //     setTimeout(() => {
-                //         Repository.get(`${baseUrl}/search`, {
-                //             params: {
-                //                 searchTerm: searchTerm,
-                //                 demo: this.currentDemo
-                //             }
-                //         })
-                //             .then(response => {
-                //                 this.suggestions = response.data.reduce(
-                //                     (acc, cur) => {
-                //                         let max = 0;
-                //                         let min = 99999;
-                //                         cur.variants.map(item => {
-                //                             if (min > item.price)
-                //                                 min = item.price;
-                //                             if (max < item.price)
-                //                                 max = item.price;
-                //                         }, []);
-
-                //                         if (cur.variants.length == 0) {
-                //                             min = cur.sale_price
-                //                                 ? cur.sale_price
-                //                                 : cur.price;
-                //                             max = cur.price;
-                //                         }
-                //                         return [
-                //                             ...acc,
-                //                             {
-                //                                 ...cur,
-                //                                 minPrice: min,
-                //                                 maxPrice: max
-                //                             }
-                //                         ];
-                //                     },
-                //                     []
-                //                 );
-                //             })
-                //             .catch(error => {});
-                //     }, 500)
-                // );
+                this.timeouts.push(
+                    setTimeout(() => {
+                        this.suggestions = this.routes.filter((item) => { return item.name.toLowerCase().includes(searchTerm.toLowerCase()) })
+                    }, 1000)
+                );
             } else {
                 this.timeouts.map(timeout => {
                     window.clearTimeout(timeout);
+                    this.suggestions = [];
                 });
-                this.suggestions = [];
             }
         },
         matchEmphasize: function(name) {
@@ -156,10 +100,6 @@ export default {
                 regExp,
                 match => '<strong>' + match + '</strong>'
             );
-        },
-        goProductPage: function() {
-            this.searchTerm = '';
-            this.suggestions = [];
         },
         searchToggle: function(e) {
             document.querySelector('.header-search').classList.toggle('show');
@@ -176,16 +116,21 @@ export default {
                 .querySelector('.header .header-search')
                 .classList.remove('show');
         },
-        submitSearchForm: function(e) {
-            this.closeSearchForm();
-            this.searchTerm = '';
+        submitSearchForm: function () {
+            let route = this.suggestions[0].path;
             this.$router.push({
-                path: '/shop/sidebar/3cols',
-                query: {
-                    searchTerm: this.searchTerm
-                }
-            });
+                path: route
+            })
         }
+        // submitSearchForm: function(e) {
+        //     this.closeSearchForm();
+        //     this.$router.push({
+        //         path: '/shop',
+        //         query: {
+        //             filter_keyword: this.searchTerm
+        //         }
+        //     });
+        // }
     }
 };
 </script>

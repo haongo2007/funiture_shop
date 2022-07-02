@@ -6,6 +6,23 @@
                 <a href="#" class="sidebar-filter-clear" @click.prevent="cleanAll">Clean All</a>
             </div>
 
+            <div class="header-search-wrapper search-wrapper-wide d-flex mb-2">
+                <input
+                    autocomplete="off"
+                    type="text"
+                    class="form-control mb-0"
+                    name="q"
+                    id="q"
+                    placeholder="Search product ..."
+                    required
+                    v-on:keyup.enter="submitSearchForm"
+                    v-model="searchTerm"
+                />
+                <button style="min-width: 50px" class="btn btn-primary" type="button" @click="submitSearchForm">
+                    <i class="icon-search"></i>
+                </button>
+            </div>
+
             <div class="widget widget-collapsible">
                 <h3 class="widget-title mb-2">
                     <a
@@ -227,6 +244,7 @@ export default {
     data: function() {
         return {
             loaded: true,
+            searchTerm:'',
             priceValues: [0,0],
             priceSliderConfig: {
                 connect: true,
@@ -281,9 +299,6 @@ export default {
       },
     },
     created: function() {
-        document
-                .querySelector('body')
-                .classList.remove('sidebar-filter-active');
         if (this.$route.query.minPrice && this.$route.query.maxPrice) {
             this.loaded = false;
 
@@ -307,8 +322,17 @@ export default {
     },
     methods: {
         priceConvert,
+        submitSearchForm: function(e) {
+            this.$router.push({
+                path: '/shop',
+                query: {
+                    filter_keyword: this.searchTerm
+                }
+            });
+        },
         cleanAll: function() {
             this.loaded = false;
+            this.searchTerm = '';
             this.priceValues = [0, 1000];
             this.$nextTick(function() {
                 this.orderBy = 'default';
