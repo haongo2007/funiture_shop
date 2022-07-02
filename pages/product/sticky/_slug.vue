@@ -39,7 +39,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import Sticky from 'vue-sticky-directive';
+import Sticky from '~/plugins/vue-sticky-directive';
 
 import GallerySticky from '~/components/partial/product/gallery/GallerySticky';
 import DetailOne from '~/components/partial/product/details/DetailOne';

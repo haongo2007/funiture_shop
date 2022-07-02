@@ -475,7 +475,7 @@
 <script>
 import { mapGetters } from 'vuex';
 
-import Sticky from 'vue-sticky-directive';
+import Sticky from '~/plugins/vue-sticky-directive';
 import BlogOne from '~/components/elements/blogs/BlogOne';
 import PageHeader from '~/components/elements/PageHeader';
 import BlogSidebar from '~/components/partial/blog/BlogSidebar';

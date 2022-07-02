@@ -33,6 +33,12 @@
                             <li>
                                 <nuxt-link to="/blog">Blog</nuxt-link>
                             </li>
+                            <li>
+                                <nuxt-link to="/pages/contact">Contact</nuxt-link>
+                            </li>
+                            <li>
+                                <nuxt-link to="/pages/about">About us</nuxt-link>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -88,9 +94,9 @@ export default {
         submitSearchForm: function() {
             this.hideMobileMenu();
             this.$router.push({
-                path: '/shop/sidebar/3cols',
+                path: '/shop',
                 query: {
-                    searchTerm: this.searchTerm
+                    filter_keyword: this.searchTerm
                 }
             });
         }

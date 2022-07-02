@@ -84,8 +84,9 @@ export default {
         { src: '~/plugins/nouislider.js', ssr: false },
         { src: '~/plugins/debounce.js', ssr: false },
         { src: '~/plugins/validate.js', ssr: false },
+        { src: '~/plugins/sticky.js', ssr: false },
+        { src: '~/plugins/i18n.js', ssr: false }
     ],
-
     modules: [ '@nuxtjs/axios' ],
 
     axios: {
@@ -100,16 +101,12 @@ export default {
 
     pageTransition: 'page',
 
-    build: {
-        publicPath: 'http://107.155.65.77:4000'
-    },
-
     generate: {
         subFolders: false,
         fallback: '404.html'
     },
 
-    ssr: false,
+    ssr: true,
 
     server: {
         port: 4000,
