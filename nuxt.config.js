@@ -101,7 +101,7 @@ export default {
     pageTransition: 'page',
 
     build: {
-        publicPath: 'http://107.155.65.77:4000'
+        publicPath: 'https://bepetshop.ecommflex.com'
     },
 
     generate: {
@@ -109,10 +109,10 @@ export default {
         fallback: '404.html'
     },
 
-    ssr: false,
+    ssr: true,
 
     server: {
-        port: 4000,
+        port: 3000,
         host: 'localhost'
     },
     env: {
