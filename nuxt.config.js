@@ -101,6 +101,13 @@ export default {
 
     pageTransition: 'page',
 
+<<<<<<< HEAD
+    build: {
+        publicPath: 'https://bepetshop.ecommflex.com'
+    },
+
+=======
+>>>>>>> 69c78336a92116b56061c2614aa766f730512924
     generate: {
         subFolders: false,
         fallback: '404.html'
@@ -109,7 +116,7 @@ export default {
     ssr: true,
 
     server: {
-        port: 4000,
+        port: 3000,
         host: 'localhost'
     },
     env: {
