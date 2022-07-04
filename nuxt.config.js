@@ -100,14 +100,10 @@ export default {
     },
 
     pageTransition: 'page',
-
-<<<<<<< HEAD
+    
     build: {
         publicPath: 'https://bepetshop.ecommflex.com'
     },
-
-=======
->>>>>>> 69c78336a92116b56061c2614aa766f730512924
     generate: {
         subFolders: false,
         fallback: '404.html'
