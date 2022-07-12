@@ -86,7 +86,7 @@ export default {
         { src: '~/plugins/validate.js', ssr: false },
     ],
 
-    modules: [ '@nuxtjs/axios' ],
+    modules: [ '@nuxtjs/axios','@nuxtjs/pwa' ],
 
     axios: {
         proxy: true, 
