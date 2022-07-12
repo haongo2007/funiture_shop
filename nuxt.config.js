@@ -101,8 +101,10 @@ export default {
 
     pageTransition: 'page',
     
+    buildDir: '_nuxt',
+
     build: {
-        publicPath: 'https://bepetshop.ecommflex.com'
+        publicPath: '_nuxt/dist/'
     },
     generate: {
         subFolders: false,
