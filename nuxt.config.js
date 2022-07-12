@@ -99,10 +99,10 @@ export default {
     },
     pageTransition: 'page',
 
-    buildDir: '_nuxt',
+    buildDir: '.nuxt',
 
     build: {
-        publicPath: '_nuxt/dist/'
+        publicPath: '.nuxt/dist/'
     },
     
     generate: {
@@ -110,7 +110,7 @@ export default {
         fallback: '404.html'
     },
 
-    ssr: false,
+    ssr: true,
 
     server: {
         port: 3000,
