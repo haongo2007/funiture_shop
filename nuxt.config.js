@@ -88,7 +88,6 @@ export default {
         { src: '~/plugins/i18n.js', ssr: false }
     ],
     modules: [ '@nuxtjs/axios' ],
-
     axios: {
         proxy: true, 
     },
@@ -106,6 +105,7 @@ export default {
     build: {
         publicPath: '_nuxt/dist/'
     },
+    
     generate: {
         subFolders: false,
         fallback: '404.html'
