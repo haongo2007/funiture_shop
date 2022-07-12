@@ -185,7 +185,9 @@ export const priceConvert = function(price) {
     let currency = window.$nuxt.$store.state.core.localized.currency;
     if(currency){
         price = price * currency.exchange_rate;
-        price = price.toFixed(2);
-        return currency.symbol+price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, currency.thousands);
+        if (currency.precision == 1) {
+            price = price.toFixed(2);
+        }
+        return (currency.symbol_first == 1 ? currency.symbol : '')+price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, currency.thousands)+(currency.symbol_first == 0 ? currency.symbol : '');
     }
 }

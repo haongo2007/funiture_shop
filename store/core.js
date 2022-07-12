@@ -136,21 +136,21 @@ export const mutations = {
     },
     [ SET_LOCALIZED ] ( state,localized ) {
         let languages = localized.languages;
-        let lang = languages[Object.keys(languages)[0]];
         if (!Cookies.get('f-language')) {
-            Cookies.set('f-language', lang.code);  
-        }else{
-            lang = languages[Cookies.get('f-language')];
+            let langDefault = state.shop.info.language;
+            Cookies.set('f-language', langDefault);  
         }
-        localized.lang = lang;
+        let language = languages[Cookies.get('f-language')];
+
 
         let currencies = localized.currencies;
-        let currency = currencies[Object.keys(currencies)[0]];
         if (!Cookies.get('f-currency')) {
-            Cookies.set('f-currency', currency.code); 
-        }else{
-            currency = currencies[Cookies.get('f-currency')];
+            let currencyDefault = state.shop.info.currency;
+            Cookies.set('f-currency', currencyDefault); 
         }
+        let currency = currencies[Cookies.get('f-currency')];
+
+        localized.lang     = language;
         localized.currency = currency;
 
         state.localized = localized;

@@ -25,7 +25,7 @@
                     </div>
                 </div>
 
-                <info-one v-if="product" :descriptions="product.short_desc" :product-id="product.id" :review-list="product.reviewList" :review-count="product.review"></info-one>
+                <info-one v-if="product" :descriptions="product.short_desc" :product-id="product.id" :review-list="product.reviewList" :review-count="product.review ? product.review : 0"></info-one>
 
                 <related-products-one :products="relatedProducts"></related-products-one>
             </div>
