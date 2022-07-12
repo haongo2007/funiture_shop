@@ -98,19 +98,13 @@ export default {
         linkExactActiveClass: 'active',
     },
     pageTransition: 'page',
-<<<<<<< HEAD
-=======
-    
+
     buildDir: '_nuxt',
 
->>>>>>> c6b3fd0c522866aec1ba58f4af7fde0824901ab6
     build: {
         publicPath: '_nuxt/dist/'
     },
-<<<<<<< HEAD
-=======
     
->>>>>>> c6b3fd0c522866aec1ba58f4af7fde0824901ab6
     generate: {
         subFolders: false,
         fallback: '404.html'
