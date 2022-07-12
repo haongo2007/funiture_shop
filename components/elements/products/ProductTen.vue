@@ -8,14 +8,14 @@
 
             <nuxt-link :to="'/product/'+ product.slug">
                 <img
-                    v-lazy="`${baseDomain}${product.pictures[0]+'&w=150&h=150'}`"
+                    v-lazy="`${baseDomain}${product.pictures[0]+'&w=350&h=350'}`"
                     alt="Product"
                     width="150"
                     height="150"
                     class="product-image"
                 />
                 <img
-                    v-lazy="`${baseDomain}${product.pictures[1]+'&w=150&h=150'}`"
+                    v-lazy="`${baseDomain}${product.pictures[1]+'&w=350&h=350'}`"
                     alt="Product"
                     width="150"
                     height="150"

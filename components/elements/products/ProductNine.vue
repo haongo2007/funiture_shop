@@ -8,14 +8,14 @@
 
             <nuxt-link :to="'/product/'+ product.slug">
                 <img
-                    v-lazy="`${baseDomain}${product.pictures[0]+'&w=150&h=150'}`"
+                    v-lazy="`${baseDomain}${product.pictures[0]+'&w=350&h=350'}`"
                     alt="Product"
                     width="150"
                     height="150"
                     class="product-image"
                 />
                 <img
-                    v-lazy="`${baseDomain}${product.pictures[1]+'&w=150&h=150'}`"
+                    v-lazy="`${baseDomain}${product.pictures[1]+'&w=350&h=350'}`"
                     alt="Product"
                     width="150"
                     height="150"
@@ -94,8 +94,8 @@
             <div class="product-cat">
                 <span v-for="(cat, index) of product.category" :key="index">
                     <nuxt-link
-                        :to="{path: '/shop/sidebar/list', query: {category: cat.slug}}"
-                    >{{ cat.name }}</nuxt-link>
+                        :to="{path: '/shop/sidebar/list', query: {category: cat.alias}}"
+                    >{{ cat.descriptions_with_lang_default.title }}</nuxt-link>
                     {{ index < product.category.length - 1 ? ',' : '' }}
                 </span>
             </div>

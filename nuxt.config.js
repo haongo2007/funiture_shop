@@ -99,12 +99,6 @@ export default {
     },
     pageTransition: 'page',
 
-    buildDir: '_nuxt',
-
-    build: {
-        publicPath: '_nuxt/dist/'
-    },
-    
     generate: {
         subFolders: false,
         fallback: '404.html'
