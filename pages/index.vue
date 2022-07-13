@@ -4,24 +4,25 @@
             <div class="swiper-carousel swiper-1" v-if="showCarousel1">
                 <div v-swiper:swiper1="carouselSetting1">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide"  v-for="(item,index) in getSlider" :key="item.id">
-                            <div class="intro-slide" v-lazy:background-image="baseDomain+item.image">
-                                <div class="container intro-content">
-                                    <div v-if="item.html" v-html="item.html">
-                                    
+                        <div class="swiper-slide" v-for="(item,index) in getSlider" :key="item.id">
+                            <a :href="item.url">
+                                <div class="intro-slide" v-lazy:background-image="baseDomain+item.image">
+                                    <div class="container intro-content">
+                                        <div v-if="item.html" v-html="item.html">
+                                        
+                                        </div>
+                                        <div v-else>
+                                            <h1 class="intro-title">
+                                                {{item.title}}
+                                            </h1>
+                                            <a :href="item.url" class="btn btn-primary" :target="item.target">
+                                                <span>Shop Now</span>
+                                                <i class="icon-long-arrow-right"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div v-else>
-                                        <h1 class="intro-title">
-                                            {{item.title}}
-                                        </h1>
-                                    </div>
-
-                                    <a :href="item.url" class="btn btn-primary" :target="item.target">
-                                        <span>Shop Now</span>
-                                        <i class="icon-long-arrow-right"></i>
-                                    </a>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
