@@ -198,6 +198,9 @@ export default {
             this.$store.dispatch('core/getInfoStore');
 		},
 		openSignInModal() {
+			if (this.$route.name == 'pages-login') {
+				return false;
+			}
 			this.$modal.show(
 				() => import('~/components/elements/modals/SignInModal'),
 				{},

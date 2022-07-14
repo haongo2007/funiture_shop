@@ -135,7 +135,6 @@ export default {
         }
     },
     created(){
-        console.log(this.getToken);
         if (this.getToken == '' || this.getToken == undefined) {
             this.$router.replace({
                 path: '/redirect/',
