@@ -98,13 +98,19 @@ export default {
         linkExactActiveClass: 'active',
     },
     pageTransition: 'page',
+
+    buildDir: '.nuxt',
+
+    build: {
+        publicPath: '.nuxt/dist/'
+    },
     
     generate: {
         subFolders: false,
         fallback: '404.html'
     },
 
-    ssr: false,
+    ssr: true,
 
     server: {
         port: 3000,
