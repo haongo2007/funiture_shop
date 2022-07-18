@@ -18,7 +18,9 @@ export default {
         return {};
     },
     created(){
-
+      this.$root.$on('close', () => {
+        this.$emit('close');
+      })
     },
     methods:{}
 };

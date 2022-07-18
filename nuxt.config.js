@@ -89,7 +89,7 @@ export default {
     ],
     modules: [ '@nuxtjs/axios' ],
     axios: {
-        proxy: true, 
+        proxy: true,
     },
 
     router: {
@@ -104,13 +104,13 @@ export default {
     build: {
         publicPath: '.nuxt/dist/'
     },
-    
+
     generate: {
         subFolders: false,
         fallback: '404.html'
     },
 
-    ssr: true,
+    ssr: true   ,
 
     server: {
         port: 3000,

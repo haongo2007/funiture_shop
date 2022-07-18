@@ -151,9 +151,10 @@ import MainMenu from '~/components/partial/headers/shared/MainMenu';
 import HeaderSearch from '~/components/partial/headers/shared/HeaderSearch';
 import StickyHeader from '~/components/elements/StickyHeader';
 import CategoriesMenu from '~/components/elements/CategoriesMenu';
-import { mapGetters, mapActions } from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 import { baseDomain } from '~/repositories/repository';
 import Cookies from 'js-cookie';
+
 export default {
     data: function() {
         return {
@@ -178,6 +179,7 @@ export default {
         ...mapGetters('core', ['getCategories']),
         ...mapGetters('customer', ['getToken']),
         ...mapGetters('customer', ['getCurrentCustomer']),
+        ...mapGetters('coupon', ['getCoupon']),
 		isFullwidth: function() {
 			return this.$route.path.includes('fullwidth');
 		},
@@ -185,6 +187,7 @@ export default {
 	created(){
 	},
 	methods: {
+    ...mapActions('coupon', ['deleteCoupon']),
 		changeCurrency(code){
 			Cookies.set('f-currency',code);
             this.$store.dispatch('core/setCurrency',code);
@@ -211,8 +214,13 @@ export default {
 			document.querySelector('body').classList.add('mmenu-active');
 		},
 		handleLogout: function() {
-            this.$store.dispatch('customer/logout');
-        	this.$vToastify.success( "successful logout" );
+      this.$store.dispatch('customer/logout');
+      this.$vToastify.success( "successful logout" );
+      for(let props in this.getCoupon){
+        if (this.getCoupon[props].login){
+          this.deleteCoupon(props);
+        }
+      }
 		}
 	}
 };

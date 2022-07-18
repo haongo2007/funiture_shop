@@ -57,7 +57,7 @@
 
                                     <label class="required">Street address * <span>{{ errors.first('address1') }}</span></label>
                                     <input
-                                        data-vv-as="Street address" :class="{'is-danger': errors.has('address1') }" data-vv-validate-on="blur" v-validate="'required'" name="address1" 
+                                        data-vv-as="Street address" :class="{'is-danger': errors.has('address1') }" data-vv-validate-on="blur" v-validate="'required'" name="address1"
                                         type="text"
                                         class="form-control"
                                         placeholder="House number and Street name"
@@ -224,7 +224,7 @@
                                         </thead>
 
                                         <tbody>
-                                            
+
                                             <tr v-for="item in getCoupon" :key="item.id">
                                                 <td>
                                                     <div class="coupon-checkout">
@@ -245,7 +245,7 @@
                                     <table class="table table-summary  mb-2">
 
                                         <tbody>
-                                            
+
                                             <tr class="summary-subtotal">
                                                 <td>Subtotal:</td>
                                                 <td>{{ priceConvert(invoice.priceSubtotal) }}</td>
@@ -259,7 +259,7 @@
                                             <div class="card-header">
                                                 <div class="custom-control custom-radio m-2" >
                                                     <input
-                                                        v-validate="'required'" 
+                                                        v-validate="'required'"
                                                         type="radio"
                                                         id="express-shipping"
                                                         name="shipping"
@@ -418,7 +418,7 @@
     </main>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 import Repository,{ baseUrl } from '~/repositories/repository';
 import { VueSlideToggle } from 'vue-slide-toggle';
 import PageHeader from '~/components/elements/PageHeader';
@@ -470,6 +470,12 @@ export default {
         ...mapGetters('customer', ['getCurrentCustomer']),
         ...mapGetters('cart', ['cartList', 'priceTotal', 'qtyTotal','priceTax']),
         ...mapGetters('coupon', ['getCoupon']),
+      customerID(){
+          if (this.getCurrentCustomer){
+            return this.getCurrentCustomer.id;
+          }
+          return null;
+      }
     },
     watch: {
       getCurrentCustomer: function(newVal) {
@@ -498,7 +504,7 @@ export default {
         let sum = this.getCoupon.reduce( ( acc, cur ) => {
             return acc + cur.value;
         }, 0 );
-        this.invoice.priceSubtotal = this.invoice.priceSubtotal + sum; 
+        this.invoice.priceSubtotal = this.invoice.priceSubtotal + sum;
         this.invoice.priceTotal = this.invoice.priceSubtotal + sum;
       },
     },
@@ -525,7 +531,7 @@ export default {
         }
     },
     methods: {
-        ...mapGetters('coupon', ['addCoupon','deleteCoupon']),
+        ...mapActions('coupon', ['addCoupon']),
         priceConvert,
         changeShippingAddress(){
             this.useOtherAddress = !this.useOtherAddress;
@@ -545,7 +551,7 @@ export default {
             for(let prop in this.togglePayment){
                 this.togglePayment[prop] = false;
             }
-            this.togglePayment[index1] = true; 
+            this.togglePayment[index1] = true;
             this.invoice.paymentMethod = this.getPaymentMethod[index1].key;
         },
         changeToggleShipping: function(item) {
@@ -562,7 +568,7 @@ export default {
                 return false
             }
             await Repository.get(`${baseUrl}/system/sanctum/csrf-cookie`).then(() => {
-                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon,total:this.invoice.priceTotal}).then((data)=>{
+                Repository.post(`${baseUrl}/discount/checkCoupon`,{code:this.coupon,total:this.invoice.priceTotal,uID:this.customerID}).then((data)=>{
                     this.addCoupon(data.data)
                     this.invoice.priceSubtotal = this.invoice.priceSubtotal + data.data.value;
                     this.invoice.priceTotal = this.invoice.priceTotal + data.data.value;
