@@ -40,11 +40,11 @@ import DetailOne from '~/components/partial/product/details/DetailOne';
 import InfoOne from '~/components/partial/product/info-tabs/InfoOne';
 import Breadcrumb from '~/components/partial/product/BreadCrumb';
 import RelatedProductsOne from '~/components/partial/product/related/RelatedProductsOne';
-import Repository, { baseUrl } from '~/repositories/repository.js';
+import { baseUrl } from '~/repositories/repository.js';
 
 export default {
     async asyncData({params,$axios}) {
-        let { data } = await $axios.get(`${baseUrl}/product/${params.slug}`);
+        let {data} = await $axios.get(`${baseUrl}/product/${params.slug}`);
         return {
             product: data.data.product,
             prevProduct: data.data.prevProduct,

@@ -1,3 +1,19 @@
+import Repository, { baseUrl } from './repositories/repository.js';
+
+const buildRoutes = async () => {
+    const [r1] = await Promise.all([
+        Repository.get(`${baseUrl}/product`).then(res => {
+            return res.data.map(product => {
+                return {
+                    route: `/product/${product.alias}`,
+                    payload: product,
+                };
+            });
+        }),
+    ]);
+
+    return [...r1];
+};
 export default {
     head: {
         titleTemplate: '',
@@ -93,6 +109,7 @@ export default {
     },
 
     router: {
+        mode: 'hash',
         base: '/',
         linkActiveClass: 'link-active',
         linkExactActiveClass: 'active',
@@ -106,8 +123,9 @@ export default {
     },
 
     generate: {
+        routes: buildRoutes,
         subFolders: false,
-        fallback: '404.html'
+        fallback: false
     },
 
     ssr: true   ,
