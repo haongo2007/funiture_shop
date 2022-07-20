@@ -43,6 +43,15 @@ import RelatedProductsOne from '~/components/partial/product/related/RelatedProd
 import Repository, { baseUrl } from '~/repositories/repository.js';
 
 export default {
+    async asyncData({params,$axios}) {
+        let { data } = await $axios.get(`${baseUrl}/product/${params.slug}`);
+        return {
+            product: data.data.product,
+            prevProduct: data.data.prevProduct,
+            nextProduct: data.data.nextProduct,
+            relatedProducts: data.data.relatedProducts,
+        }
+    },
     head() {
         return Object.assign({},this.head);
     },
@@ -70,10 +79,6 @@ export default {
                     },
                 ]
             },
-            product: null,
-            prevProduct: null,
-            nextProduct: null,
-            relatedProducts: [],
             loaded: false,
             ProductDetail:'',
             ProductGallery:'',
@@ -96,7 +101,13 @@ export default {
         }
     },
     created: function() {
-        this.getProduct();
+        if (!Object.keys(this.product).length) {
+            this.$router.push({path: '/pages/404'});
+        }
+        this.ProductDetail = 'DetailOne';
+        this.ProductGallery = 'GalleryVertical';
+        this.loaded = true;
+        // this.getProduct();
     },
     methods: {
         getProduct: async function() {

@@ -102,7 +102,7 @@ export default {
     buildDir: '.nuxt',
 
     build: {
-        publicPath: '.nuxt/dist/'
+        // publicPath: '.nuxt/dist/'
     },
 
     generate: {
