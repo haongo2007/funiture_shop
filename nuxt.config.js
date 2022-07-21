@@ -119,7 +119,7 @@ export default {
     buildDir: '.nuxt',
 
     build: {
-        // publicPath: '.nuxt/dist/'
+        publicPath: '.nuxt/dist/'
     },
 
     generate: {
@@ -128,7 +128,7 @@ export default {
         fallback: false
     },
 
-    ssr: true   ,
+    ssr: true,
 
     server: {
         port: 3000,
