@@ -39,68 +39,6 @@
                 </vue-slide-toggle>
             </div>
 
-            <!-- <div class="widget widget-collapsible">
-                <h3 class="widget-title mb-2">
-                    <a
-                        href="#widget-2"
-                        :class="{collapsed: !toggleStates[1]}"
-                        @click.prevent="toggleSlide(1)"
-                    >Size</a>
-                </h3>
-
-                <vue-slide-toggle :open="toggleStates[1]" class="show" :duration="200">
-                    <div class="widget-body pt-0">
-                        <div class="filter-items">
-                            <div
-                                class="filter-item"
-                                v-for="(item, index) in filterData.sizes"
-                                :key="index"
-                            >
-                                <div class="custom-control custom-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        class="custom-control-input"
-                                        :id="'size-' + index"
-                                        @click="setSizeFilter(item)"
-                                        :checked="sizeChecked(item)"
-                                    />
-                                    <label
-                                        class="custom-control-label"
-                                        :for="'size-' + index"
-                                    >{{ item.slug }}</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </vue-slide-toggle>
-            </div>
-
-            <div class="widget widget-collapsible">
-                <h3 class="widget-title mb-2">
-                    <a
-                        href="#widget-3"
-                        :class="{collapsed: !toggleStates[2]}"
-                        @click.prevent="toggleSlide(2)"
-                    >Colour</a>
-                </h3>
-
-                <vue-slide-toggle :open="toggleStates[2]" class="show" :duration="200">
-                    <div class="widget-body pt-0">
-                        <div class="filter-colors">
-                            <nuxt-link
-                                :to="getColorUrl(item)"
-                                :style="{'background-color': item.color}"
-                                v-for="(item, index) in filterData.colors"
-                                :key="index"
-                                :class="{selected: colorSelected(item)}"
-                            >
-                                <span class="sr-only">{{ item.color_name }}</span>
-                            </nuxt-link>
-                        </div>
-                    </div>
-                </vue-slide-toggle>
-            </div> -->
-
             <div class="widget widget-collapsible" v-for="(item,index) in getAttributes" :key="index">
                 <h3 class="widget-title mb-2">
                     <a
@@ -207,15 +145,14 @@
                                     <span id="filter-price-range">{{ priceRangeText }}</span>
                                 </span>
                             </div>
-
-                            <vue-nouislider
-                                :config="priceSliderConfig"
-                                :values="priceValues"
-                                id="price-slider"
-                                v-if="loaded"
-                            ></vue-nouislider>
+                              <vue-nouislider
+                                  :config="priceSliderConfig"
+                                  :values="priceValues"
+                                  id="price-slider"
+                                  v-if="loaded"
+                              ></vue-nouislider>
                         </div>
-                            
+
                         <nuxt-link :to="priceFilterRoute" class="pr-2">
                             <a href="javascript:;" class="btn btn-outline-dark btn-rounded">Filter</a>
                         </nuxt-link>
@@ -292,13 +229,13 @@ export default {
     watch: {
       getMaximumPrice: function(newVal) {
         this.priceValues = [0,newVal];
-        this.priceSliderConfig.range.max = newVal;     
+        this.priceSliderConfig.range.max = newVal;
       },
       getAttributes: function(newVal) {
 
       },
     },
-    created: function() {
+    mounted: function() {
         if (this.$route.query.minPrice && this.$route.query.maxPrice) {
             this.loaded = false;
 
@@ -317,7 +254,7 @@ export default {
             });
 
             this.priceValues = [0,this.getMaximumPrice];
-            this.priceSliderConfig.range.max = this.getMaximumPrice;   
+            this.priceSliderConfig.range.max = this.getMaximumPrice;
         }
     },
     methods: {

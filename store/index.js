@@ -1,4 +1,5 @@
 export const actions = {
-    async nuxtServerInit ( { commit, dispatch } ) {
+    async nuxtServerInit({ dispatch }) {
+        await dispatch('core/getInfoStore');
     }
 }

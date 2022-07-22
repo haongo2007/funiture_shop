@@ -46,14 +46,30 @@ export default {
     async asyncData({params,$axios}) {
         let {data} = await $axios.get(`${baseUrl}/product/${params.slug}`);
         return {
-            product: data.data.product,
-            prevProduct: data.data.prevProduct,
-            nextProduct: data.data.nextProduct,
-            relatedProducts: data.data.relatedProducts,
+            product: data.product,
+            prevProduct: data.prevProduct,
+            nextProduct: data.nextProduct,
+            relatedProducts: data.relatedProducts,
         }
     },
+    data: function() {
+      return {
+        loaded: false,
+        ProductDetail:'',
+        ProductGallery:'',
+      };
+    },
     head() {
-        return Object.assign({},this.head);
+      return {
+        title: this.product.name,
+        meta: [
+          {
+            hid: 'description',
+            name: 'description',
+            content: 'Home page description'
+          }
+        ]
+      }
     },
     components: {
         DetailOne,
@@ -62,43 +78,8 @@ export default {
         GalleryVertical,
         RelatedProductsOne
     },
-    data: function() {
-        return {
-            head:{
-                titleTemplate: '',
-                title: '',
-                meta: [
-                    {
-                        id: '',
-                        name: '',
-                        content:''
-                    },
-                    {
-                        name: 'keywords',
-                        content: ''
-                    },
-                ]
-            },
-            loaded: false,
-            ProductDetail:'',
-            ProductGallery:'',
-        };
-    },
     computed:{
         ...mapGetters('core', ['titlePage']),
-        metaData(){
-            if ( this.product != null) {
-                return [this.product.name,this.titlePage];
-            }
-        }
-    },
-    watch:{
-        metaData(newVal){
-            if (newVal[0] != '' && newVal[1] != '' && this.head.title !== null) {
-                this.head.titleTemplate = newVal[0] + ' | ' + newVal[1];
-                this.head.title =  newVal[0] + ' | ' + newVal[1];
-            }
-        }
     },
     created: function() {
         if (!Object.keys(this.product).length) {

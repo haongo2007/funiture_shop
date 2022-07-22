@@ -1,5 +1,6 @@
 import Repository, { baseUrl } from '~/repositories/repository.js';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 export const SET_SHOP = 'SET_SHOP';
 export const SET_LOCALIZED = 'SET_LOCALIZED';
@@ -7,9 +8,13 @@ export const SET_METHOD = 'SET_METHOD';
 export const SET_DISPLAY = 'SET_DISPLAY';
 export const SET_CURRENCY = 'SET_CURRENCY';
 export const SET_LANG = 'SET_LANG';
+export const SET_PAGE_TITLE = 'SET_PAGE_TITLE';
+export const SET_STORE_TITLE = 'SET_STORE_TITLE';
 
 export const state = () => (
     {
+        store_title:'',
+        page_title:'',
         shop: {},
         localized:{},
         method:{},
@@ -28,10 +33,10 @@ export const getters = {
         return '';
     },
     titlePage: state => {
-        if (Object.keys(state.shop).length > 0) {
-            return state.shop.info.descriptions_current_lang[0].title;
-        }
-        return '';
+        return state.page_title;
+    },
+    titleStore: state => {
+        return state.store_title;
     },
     getLanguages: state => {
         return state.localized.languages;
@@ -115,15 +120,18 @@ export const actions = {
             commit(SET_LOCALIZED,data.localized)
             commit(SET_METHOD,data.method)
             commit(SET_DISPLAY,data.display)
-            commit(SET_PRIMARY,data.id)
+            commit(SET_STORE_TITLE, data.shop.info.descriptions_current_lang[0].title)
         })
-        .catch(error => ({ error: JSON.stringify(error) })); 
+        .catch(error => ({ error: JSON.stringify(error) }));
     },
     setCurrency({ commit },currency){
         commit(SET_CURRENCY,currency)
     },
     setLang({ commit },lang){
         commit(SET_LANG,lang)
+    },
+    setPageTitle({commit},title){
+        commit(SET_PAGE_TITLE,title)
     }
 }
 
@@ -138,7 +146,7 @@ export const mutations = {
         let languages = localized.languages;
         if (!Cookies.get('f-language')) {
             let langDefault = state.shop.info.language;
-            Cookies.set('f-language', langDefault);  
+            Cookies.set('f-language', langDefault);
         }
         let language = languages[Cookies.get('f-language')];
 
@@ -146,7 +154,7 @@ export const mutations = {
         let currencies = localized.currencies;
         if (!Cookies.get('f-currency')) {
             let currencyDefault = state.shop.info.currency;
-            Cookies.set('f-currency', currencyDefault); 
+            Cookies.set('f-currency', currencyDefault);
         }
         let currency = currencies[Cookies.get('f-currency')];
 
@@ -167,6 +175,12 @@ export const mutations = {
     },
     [ SET_LANG ] ( state,lang ) {
         let found = state.localized.languages[lang];
-        state.localized.lang = found; 
+        state.localized.lang = found;
+    },
+    [ SET_PAGE_TITLE ] ( state,title ) {
+        state.page_title = title;
+    },
+    [ SET_STORE_TITLE ] ( state,title ) {
+        state.store_title = title;
     },
 }

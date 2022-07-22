@@ -19,79 +19,47 @@ import FooterDefault from '~/components/partial/footers/FooterDefault';
 import { isSafariBrowser, isEdgeBrowser } from '~/utilities/common';
 import { mapGetters, mapActions } from 'vuex';
 import Cookies from 'js-cookie';
+import {baseUrl} from "~/repositories/repository";
 
 export default {
-    head() {
-        return Object.assign({},this.head);
-    },
-    data:function(){
-        return {
-            head:{
-                titleTemplate: '',
-                title: '',
-                meta: [
-                    {
-                        hid: '',
-                        name: '',
-                        content:''
-                    },
-                    {
-                        name: 'author',
-                        content: ''
-                    },
-                    {
-                        name: 'keywords',
-                        content: ''
-                    },
-                    {
-                        name: 'app-mobile-web-app-title',
-                        content: ''
-                    },
-                    {
-                        name: 'application-name',
-                        content: '',
-                    },
-                ]
-            }
-        }
-    },
     components: {
         HeaderDefault,
         FooterDefault: () =>
             import('~/components/partial/footers/FooterDefault'),
         MobileMenu: () => import('~/components/partial/home/MobileMenu')
     },
-    mounted: function() {
-        let scrollTop = this.$refs.scrollTop;
-        document.addEventListener(
-            'scroll',
-            function() {
-                if (window.pageYOffset >= 400) {
-                    scrollTop.classList.add('show');
-                } else {
-                    scrollTop.classList.remove('show');
-                }
-            },
-            false
-        );
-        if (!this.shop_info) {
-            this.$store.dispatch('core/getInfoStore').then(response => {
-                // set meta
-                this.head.titleTemplate = this.titlePage();
-                this.head.title = this.titlePage();
-            });
-        }
+    created: function() {
+        let store = this.checkStore();
         if (Cookies.get('f-token')) {
             this.$store.dispatch('customer/setToken',Cookies.get('f-token'));
             this.$store.dispatch('customer/getCustomer');
         }
     },
-    computed:{
-        ...mapGetters('core', ['shop_info']),
-        ...mapGetters('core', ['getCurrency']),
+    beforeMount () {
+      this.handleScroll;
+    },
+    beforeDestroy() {
+      this.handleScroll;
     },
     methods: {
-        ...mapGetters('core', ['titlePage']),
+        ...mapActions('core', ['getInfoStore']),
+        handleScroll () {
+          let scrollTop = this.$refs.scrollTop;
+          document.addEventListener(
+              'scroll',
+              function() {
+                if (window.pageYOffset >= 400) {
+                  scrollTop.classList.add('show');
+                } else {
+                  scrollTop.classList.remove('show');
+                }
+              },
+              false
+          );
+        },
+        async checkStore() {
+          await this.getInfoStore();
+        },
         scrollTop: function() {
             if (isSafariBrowser() || isEdgeBrowser()) {
                 let pos = window.pageYOffset;

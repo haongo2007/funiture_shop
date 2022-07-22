@@ -16,8 +16,9 @@ const buildRoutes = async () => {
 };
 export default {
     head: {
-        titleTemplate: '',
-        title: '',
+        titleTemplate(titleChunk) {
+            return titleChunk ? titleChunk : this.$store.getters['core/titleStore']
+        },
         meta: [
             { charset: 'utf-8' },
             {
@@ -89,7 +90,7 @@ export default {
         '~/static/css/bootstrap.min.css',
         '~/assets/scss/style.scss',
     ],
-
+    mode:'universal',
     plugins: [
         { src: '~/plugins/swiper.js', ssr: false },
         { src: '~/plugins/localStorage.js', ssr: false },
@@ -114,12 +115,10 @@ export default {
         linkActiveClass: 'link-active',
         linkExactActiveClass: 'active',
     },
-    pageTransition: 'page',
-
     buildDir: '.nuxt',
 
     build: {
-        publicPath: '.nuxt/dist/'
+        // publicPath: '.nuxt/dist/'
     },
 
     generate: {

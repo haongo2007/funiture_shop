@@ -155,25 +155,24 @@ export default {
         ShopSidebarOne
     },
     head() {
-        return Object.assign({},this.head);
+      return {
+        titleTemplate: '',
+            title: '',
+            meta: [
+          {
+            hid: '',
+            name: '',
+            content:''
+          },
+          {
+            name: 'keywords',
+            content: ''
+          },
+        ]
+      }
     },
     data: function() {
         return {
-            head:{
-                titleTemplate: '',
-                title: '',
-                meta: [
-                    {
-                        hid: '',
-                        name: '',
-                        content:''
-                    },
-                    {
-                        name: 'keywords',
-                        content: ''
-                    },
-                ]
-            },
             pageTitle:'Shop',
             products: [],
             perPage: 0,
@@ -188,7 +187,7 @@ export default {
     computed: {
         ...mapGetters('core', ['titlePage','getProducListDisplay']),
         containerClass: function() {
-            if (this.$route.params.type == 'fullwidth')
+            if (this.$route.params.type === 'fullwidth')
                 return 'container-fluid';
             else return 'container';
         },
@@ -201,7 +200,7 @@ export default {
             this.getProducts(true);
         },
         getProducListDisplay:function (newVal) {
-            if (this.perPage == 0) {
+            if (this.perPage === 0) {
                 this.perPage = parseInt(this.getProducListDisplay.value);
                 this.getProducts();
             }
